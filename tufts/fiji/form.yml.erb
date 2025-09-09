@@ -1,0 +1,13 @@
+---
+cluster: "pax"
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - bc_vnc_resolution
+
+attributes:
+  bc_vnc_resolution:
+    required: true
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/small/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/small/num_memory.yml").indent(2) %>

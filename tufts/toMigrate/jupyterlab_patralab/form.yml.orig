@@ -1,0 +1,52 @@
+---
+
+cluster: "pax"
+
+attributes:
+  modules: "jupyter"
+
+  conda_extensions: "0"
+
+  extra_jupyter_args: ""
+
+  num_cores:
+    widget: "select"
+    label: "Number of cores"
+    help: |
+      Number of cores.
+    options:
+      - ["1", "1"]
+      - ["2", "2"]
+      - ["4", "4"]
+      - ["8", "8"]
+      - ["16", "16"]
+      - ["32", "32"]
+      - ["74", "74"]
+
+  num_memory:
+    widget: "select"
+    label: "Amount of memory"
+    help: |
+      Amount of memory (in GB).
+    options:
+      - ["1GB", "1000"]
+      - ["2GB", "2000"]
+      - ["4GB", "4000"]
+      - ["8GB", "8000"]
+      - ["16GB", "16000"]
+      - ["32GB", "32000"]
+      - ["64GB", "64000"]
+      - ["128GB", "128000"]
+      - ["256GB", "256000"]
+
+form:
+  - modules
+  - conda_extensions
+  - extra_jupyter_args
+#  - bc_account
+#  - bc_queue
+  - bc_num_hours
+  - num_cores
+  - num_memory
+#  - bc_num_slots
+#  - bc_email_on_started

@@ -1,0 +1,10 @@
+---
+name: Matlab server
+category: Interactive Apps
+subcategory: Servers
+role: batch_connect
+description: |
+  This app will launch the [MATLAB] desktop in a web browser on [Tufts HPC].
+
+  [MATLAB]: https://www.mathworks.com/products/matlab.html
+  [Tufts HPC]: https://it.tufts.edu/high-performance-computing

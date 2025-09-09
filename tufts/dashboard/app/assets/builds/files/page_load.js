@@ -1,0 +1,2 @@
+function r(){let e=document.getElementById("files_page_load_config");if(e===null)return;let t=e.dataset;history.replaceState({currentDirectory:t.currentDirectory,currentDirectoryUrl:t.currentDirectoryUrl,currentDirectoryUpdatedAt:t.currentDirectoryUpdatedAt,currentFilesPath:t.currentFilesPath,currentFilesUploadPath:t.currentFilesUploadPath,currentFilesystem:t.currentFilesystem},null)}export{r as setPageLoadState};
+//# sourceMappingURL=page_load.js.map

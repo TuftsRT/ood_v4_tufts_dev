@@ -1,0 +1,7 @@
+---
+name: "Ollama + Open WebUI"
+category: "Interactive Apps"
+subcategory: "AI"
+role: "batch_connect"
+description: |
+  This app launches an instance of [Ollama](https://ollama.com/) with [Open-WebUI](https://github.com/open-webui/open-webui) as the interface, enabling users to run language models on the Tufts HPC system.

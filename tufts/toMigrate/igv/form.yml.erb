@@ -1,0 +1,85 @@
+---
+cluster: "pax"
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - bc_vnc_resolution
+#  - hpcpartition
+  - reservation
+  - igv_directory
+
+attributes:
+  bc_vnc_resolution:
+    required: true
+
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/large/num_cores.yml").indent(2) %>
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/large/num_memory.yml").indent(2) %>
+
+#  num_cores:
+#    widget: "select"
+#    label: "Number of cores"
+#    help: |
+#      Number of cores.
+#    options:
+#      - ["1", "1"]
+#      - ["2", "2"]
+#      - ["4", "4"]
+#      - ["8", "8"]
+#      - ["16", "16"]
+#      - ["32", "32"]
+#      - ["64", "64"]
+#
+#  num_memory:
+#    widget: "select"
+#    label: "Amount of memory"
+#    help: |
+#      Amount of memory (in GB).
+#    options:
+#      - ["1GB", "1000"]
+#      - ["2GB", "2000"]
+#      - ["4GB", "4000"]
+#      - ["8GB", "8000"]
+#      - ["16GB", "16000"]
+#      - ["32GB", "32000"]
+#      - ["64GB", "64000"]
+#      - ["128GB", "128000"]
+#      - ["256GB", "256000"]
+#      - ["512GB", "512000"]
+#      - ["1TB", "1000000"]
+
+
+
+
+<%# File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/partition.yml").indent(2) %>
+
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/reservation.yml").indent(2) %>
+
+#  ppartition:
+#    widget: select
+#    label: "Partition"
+#    help: "If unsure, use default batch partition. Preempt partition uses excess 
+#    capacity that might cancel your job if higher priority job comes in unless there is 
+#    an even higher priority reservation asigned (see below)"
+#    options:
+#      - [ "Default Batch Partition", "batch" ]
+#      - [ "Preempt Partition", "preempt" ]
+
+#  reservation:
+#    widget: select
+#    label: "Reservation for class, training, workshop."
+#    help: "If you don't know about specific reservation, select default."
+#    options:
+#      - [ "Default", "" ]
+#      - [ "Bioinformatics Workshop", "bioworkshop" ]
+#      - [ "Moore Lab Reservation", "moorelabres" ]
+
+
+  igv_directory:
+    widget: "text_field"
+    label: "Directory"
+    help: "Directory for igv genomes, leave blank if you'd like to create an igv directory in your home directory, or use the directory /cluster/tufts/bio/tools/igv/igv_home/ which has many genomes stored."
+    value: "/cluster/tufts/bio/tools/igv/igv_home/"

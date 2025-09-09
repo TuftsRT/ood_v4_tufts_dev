@@ -1,0 +1,42 @@
+---
+
+cluster: "pax"
+
+attributes:
+
+  conda_extensions: "0"
+
+  extra_jupyter_args: ""
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/small/num_cores.yml").indent(2) %>
+
+  num_memory:
+    widget: "select"
+    label: "Amount of memory"
+    help: "Enter memory amount in GB, i.e. `500` for 500GB or `1000` for 1TB"
+    required: true
+    widget: "number_field"
+    pattern: "[0-9]{1,2,3}"
+    id: 'num_memory'
+    max: 1400
+  version:
+    widget: select
+    label: "Jupyter, R, Python Version"
+    help: "This defines the version of Jupter you want to load."
+    options:
+      - [ "Jupyter 4.4.0 Python 2.7.14", "jupyter/1.0" ]
+      - [ "Jupyter 4.4.0 Python 3.7.1", "jupyter/3.0" ]
+
+
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+#  - bc_account
+#  - bc_queue
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+#  - bc_num_slots
+#  - bc_email_on_started

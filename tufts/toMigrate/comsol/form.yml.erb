@@ -1,0 +1,30 @@
+---
+cluster: "pax"
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - reservation
+  - bc_vnc_resolution
+  - version
+
+attributes:
+  bc_vnc_resolution:
+    required: true
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/medium/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/medium/num_memory.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/reservation.yml").indent(2) %>
+
+  version:
+    widget: select
+    label: "Comsol version"
+    help: "This defines the version of Comsol you want to load."
+    options:
+      - [ "5.2", "comsol/5.2" ]
+      - [ "5.2a", "comsol/5.2a" ]
+      - [ "5.3", "comsol/5.3" ]
+      - [ "5.4", "comsol/5.4" ]
+      - [ "5.6", "comsol/5.6" ]
+      - [ "6.0", "comsol/6.0" ]
+      - [ "6.1", "comsol/6.1" ]
+      - [ "6.2", "comsol/6.2" ]

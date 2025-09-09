@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+unset XDG_RUNTIME_DIR
+
+#
+# Start Jupyter Notebook Server
+#
+
+# Purge the module environment to avoid conflicts
+module purge
+
+# List loaded modules
+module list
+
+# Load the require modules
+# DM add "module load texlive/20210325 " for export pynb as pdf
+module load texlive/20210325 ffmpeg/3.2.2
+workdir="<%= context.working_directory %>"
+course="<%= context.course %>"
+
+# Set the working directory for the notebook
+if [[ -n "${workdir}" && -d "${workdir}" ]]; then
+  cd "${workdir}"
+else
+  cd "$HOME"
+fi
+
+# whether lab or notebook
+jupyterlab_switch="<%= context.jupyterlab_switch %>"
+if [[ $jupyterlab_switch == "1" ]]; then
+  app="lab"
+  module load jupyter/3.0
+else
+  app="notebook"
+  module load miniforge/24.7.1-py312
+fi
+
+# List loaded modules
+module list
+
+echo "TIMING - Starting jupyter at: $(date)"
+
+export JUPYTER_PATH="${PWD}/share/jupyter:/cluster/tufts/hpc/tools/miniforge3/envs/kernels/$course"
+jupyter kernelspec list
+
+# Launch the Jupyter Notebook Server
+jupyter $app --config="${CONFIG_FILE}" <%= context.extra_jupyter_args %>

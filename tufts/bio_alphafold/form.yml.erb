@@ -1,0 +1,254 @@
+---
+
+cluster: "pax"
+bc_dynamic_js: true
+
+attributes:
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+  version:
+    label: Software Version
+    widget: select
+    options:
+           - ["2.3.1"]
+           - ["2.3.2"]
+
+  database:
+    label: Database
+    widget: select
+    options:
+      - ["20231031", "full_db_20231031"]
+
+  fasta_paths:
+    widget: "path_selector"
+    required: false
+    label: fasta_paths
+    help: | 
+           The fasta files containing amino acid sequence(s) to fold. If there are more multiple files, please separate them using comma(e.g. seq1.fasta,seq2.fasta) 
+    favorites:
+        - /cluster/tufts
+        - /cluster/home
+
+  input_sequences:
+    label: Input protein sequences
+    widget: 'check_box'
+    html_options:
+        data:
+            hide-sequence1-when-un-checked: true
+            hide-sequence2-when-un-checked: true
+            hide-sequence3-when-un-checked: true
+            hide-sequence4-when-un-checked: true
+            hide-sequence5-when-un-checked: true
+            hide-sequence6-when-un-checked: true
+            hide-sequence7-when-un-checked: true
+            hide-sequence8-when-un-checked: true
+            hide-sequence9-when-un-checked: true
+            hide-sequence10-when-un-checked: true
+    help: |
+        Check this box if you want to input protein sequences directly. 
+        If you want to use fasta files, please uncheck this box and use fasta_paths.
+
+  sequence1:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_1
+    help: |
+        Enter the 1st amino acid sequence(s) to fold:
+
+  sequence2:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_2
+    help: |
+        Enter the 2nd amino acid sequence(s) to fold:
+
+  sequence3:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_3
+    help: |
+        Enter the 3rd amino acid sequence(s) to fold:
+
+  sequence4:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_4
+    help: |
+        Enter the 4th amino acid sequence(s) to fold:
+
+
+  sequence5:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_5
+    help: |
+        Enter the 5th amino acid sequence(s) to fold:
+
+  sequence6:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_6
+    help: |
+        Enter the 6th amino acid sequence(s) to fold:
+
+  sequence7:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_7
+    help: |
+            Enter the 7th amino acid sequence(s) to fold:
+
+  sequence8:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_8
+    help: |
+            Enter the 8th amino acid sequence(s) to fold:
+
+  sequence9:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_9
+    help: |
+            Enter the 9th amino acid sequence(s) to fold:
+
+  sequence10:
+    widget: text_field
+    required: false
+    value: " "
+    label: Amino acid sequence_10
+    help: |
+            Enter the 10th amino acid sequence(s) to fold:
+
+  workdir:
+    label: "Working Directory"
+    widget: "path_selector"
+    directory: "/cluster/tufts"      
+    required: false
+    label: Working directory
+    favorites:
+        - /cluster/tufts
+        - /cluster/home
+                      
+  output_dir:
+    widget: "text_field"
+    required: true
+    label: "Output directory Name"
+    help: "Where the results will be going to (relative to the working directory field above). Example: alphafold.out" 
+
+  model_preset:
+    widget: select
+    label: "model_preset"
+    options:
+      - [ 
+         "monomer",  "--model_preset=monomer",
+         data-hide-num-multimer-predictions-per-model: true
+        ]
+      - [ "multimer",  "--model_preset=multimer" ]
+    help: |
+           Select to run the monomer or multimer model for sequences. 
+
+  max_template_date:
+    label: max_template_date
+    widget: text_field
+    value: "2020-01-01"
+    help: |
+           Maximum template release date to consider (ISO-8601 format: YYYY-MM-DD).Important if folding historical test sets.
+
+  advanced_options:
+    label: Advanced Options
+    widget: 'check_box'
+    html_options:
+        data:
+            hide-models_to_relax-when-un-checked: true
+            hide-run_relax-when-un-checked: true
+            hide-use_precomputed_msas-when-un-checked: true
+            hide-num_multimer_predictions_per_model-when-un-checked: true
+            hide-extra_parameters-when-un-checked: true
+
+  models_to_relax:
+    widget: select
+    label: "models_to_relax"
+    options:
+      - [ "best",  "--models_to_relax=best" ]
+      - [ "all",   "--models_to_relax=all" ]
+      - [ "none",   "--models_to_relax=none" ]
+    help: |
+           After generating the predicted model, AlphaFold runs a relaxation step to improve local geometry. By default, only the best model (by pLDDT) is relaxed (--models_to_relax=best), but also all of the models (--models_to_relax=all) or none of the models (--models_to_relax=none) can be relaxed.
+
+  run_relax:
+    label: run_relax
+    widget: check_box
+    checked_value: 1
+    unchecked_value: 0
+    help: |
+           Note: this is only required for v.2.3.1. You can ignore this for v.2.3.2 and later versions. 
+           Whether to run the final relaxation step on the predicted models. Turning relax off might result in predictions with
+           distracting stereochemical violations but might help in case you are having issues with the relaxation stage.
+
+  use_precomputed_msas:
+    label: use_precomputed_msas
+    widget: check_box
+    checked_value: 1
+    unchecked_value: 0
+    help: |
+           AlphaFold can re-use MSAs (multiple sequence alignments) for the same sequence; this can be useful for trying different AlphaFold parameters. This option assumes that the directory structure generated by the first AlphaFold run in the output directory exists and that the protein sequence is the same.
+         
+  num_multimer_predictions_per_model:
+    label: num_multimer_predictions_per_model
+    widget: number_field
+    max: 100
+    min: 1
+    value: 5
+    help: |
+           How many predictions (each with a different random seed) will be generated per model. E.g. if this is 2 and there are 5 models then there will be 10 predictions per input. Note: this FLAG only applies if model_preset=multimer. (default: 5).
+
+  extra_parameters:
+    widget: text_field
+    required: false
+    label: Extra parameters
+    help: |
+           Extra parameters to use. Multiple space-separated parameters can be used.
+
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - partition
+  - gpu_type 
+  - version
+  - database
+  - workdir
+  - output_dir
+  - fasta_paths
+  - input_sequences
+  - sequence1
+  - sequence2
+  - sequence3
+  - sequence4
+  - sequence5
+  - sequence6
+  - sequence7
+  - sequence8
+  - sequence9
+  - sequence10
+  - model_preset
+  - max_template_date
+  - advanced_options
+  - models_to_relax
+  - run_relax
+  - use_precomputed_msas
+  - num_multimer_predictions_per_model
+  - extra_parameters

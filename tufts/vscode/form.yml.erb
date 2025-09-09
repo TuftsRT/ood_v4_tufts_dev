@@ -1,0 +1,28 @@
+---
+cluster: "pax"
+form:
+  - partition
+  - num_cores
+  - num_memory
+  - gpu_type
+  - bc_num_hours
+  - version
+
+attributes:
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+  version:
+    widget: select
+    label: "Code Server Version"
+    options:
+      - [ "4.102.3", "vscode-server/4.102.3"]
+
+  bc_num_hours:
+    max: 60
+    help: |
+      Your job will be automatically killed after this amount of time
+
+

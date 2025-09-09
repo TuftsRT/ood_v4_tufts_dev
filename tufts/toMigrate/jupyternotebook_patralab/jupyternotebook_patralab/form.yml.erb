@@ -1,0 +1,65 @@
+---
+
+cluster: "pax"
+
+attributes:
+  conda_extensions: "0"
+
+  extra_jupyter_args: ""
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_memory.yml").indent(2) %>
+
+  version:
+    widget: select
+    label: "Jupyter, R, Python Version"
+    help: "This defines the version of Jupter you want to load."
+    options:
+      - [ "Jupyter 4.4.0 Python 2.7.14", "jupyter/1.0" ]
+      - [ "Jupyter 4.4.0 Python 3.7.1", "jupyter/3.0" ]
+      - [ "Jupyter 4.7.1 Python 3.8.8", "anaconda/2021.05" ]
+
+  gpu_partition:
+    widget: "select"
+    label: "Select CPU or GPU job type"
+    options:
+      - ["GPU", "gpujob"]
+      - ["CPU", "cpujob"]
+    value: "cpujob"
+    
+  gpu_type:
+    label: "GPU Arch"
+    help: "Please select an architecture from the drop-down to allocate one GPU."
+    widget: "select"
+    options:
+      - [ "v100 - 16GB", "v100" ]
+      - [ "A100 - 80GB", "a100" ]
+      - [ "NONE", "nogpu" ]
+    value: "nogpu"
+
+  module:
+    widget: text_field
+    label: "Load Supporting Modules"
+    help: "ENTER module name ONLY.\n e.g. for \"module load cuda/12.2\" in command line, ENTER \"cuda/12.2\""
+  working_directory:
+    widget: "text_field"
+    label: "Top Working Directory"
+    help: "Top working directory for your Jupyter Notebook session to access your notebooks and data. If your files are stored in your lab directory, use \"/cluster/tufts/your_lab\" as the top working directory.Otherwise, you can use home directory \"/cluster/home/your_username\""
+    value: "/cluster/home/$USER"
+    
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+#  - bc_account
+#  - bc_queue
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+  - gpu_partition
+  - gpu_type
+  - working_directory
+#  - bc_num_slots
+#  - bc_email_on_started
+  - module

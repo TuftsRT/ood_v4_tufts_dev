@@ -1,0 +1,9 @@
+---
+name: Project Manager
+description: |-
+  The Open OnDemand Project Manager
+category: Jobs
+icon: fa://wrench
+role: projects
+url: projects
+new_window: false

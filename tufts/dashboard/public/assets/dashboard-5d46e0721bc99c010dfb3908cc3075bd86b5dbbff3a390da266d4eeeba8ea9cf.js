@@ -1,0 +1,4 @@
+function a(e){e.preventDefault();let n=e.target.href;if(n==null){let t=e.target.closest("a");if(t.hasChildNodes(e.target))n=t.href;else return}if(window.open(n)==null){let t=document.getElementById("js-alert-danger-template").innerHTML,o="This link is configured to open in a new window, but it doesn't seem to have opened. Please disable your popup blocker for this page and try again.",c=document.querySelectorAll('div[role="main"]')[0],r=document.createElement("div");r.innerHTML=t.split("ALERT_MSG").join(o),c.prepend(r)}}document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll("a[target=_blank]").forEach(n=>{n.addEventListener("click",t=>{a(t)})})});
+//# sourceMappingURL=/pun/sys/dashboard/assets/dashboard.js-4ad3df6fc8bde2035e02d459553ff615c104ec30809d76b49dd8c1fbffe65ce3.map
+//!
+;

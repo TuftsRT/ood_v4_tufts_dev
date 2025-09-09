@@ -1,0 +1,37 @@
+---
+cluster: "pax"
+
+form:
+  - bc_num_hours
+  - num_cores
+  - version
+  - git_repo
+  - branch
+
+attributes:
+  num_cores:
+    widget: "select"
+    label: "Cores"
+    options:
+      - ["2", "4"]
+      - ["4", "8"]
+
+  version:
+    label: Version
+    widget: select
+    options:
+          - ["1.0"]
+
+  git_repo:
+    label: Local Github Repository
+    widget: path_selector
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home 
+
+  branch:
+    widget: text_field
+    required: false
+    value: " "
+    label: Repository branch

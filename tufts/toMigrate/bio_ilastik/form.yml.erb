@@ -1,0 +1,43 @@
+---
+cluster: "pax"
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - gpu_partition
+  - gpu_type
+  - bc_vnc_resolution
+  - version
+
+attributes:
+  bc_vnc_resolution:
+    required: true
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/large/num_memory.yml").indent(2) %>
+  
+  gpu_partition:
+    widget: select
+    label: "Select preempt or normal gpu partition"
+    help: "NOTE: jobs submitted to the preempt partition may get automatically killed to allow higher priority jobs to run"
+    options:
+      - ["preempt"]
+      - ["gpu"]
+    value: "preempt"
+
+  gpu_type:
+    widget: "select"
+    label: "Select the GPU type"
+    help: "gpu partition only has a100 and p100, preempt partition has all listed gpu types."
+    options:
+      - ["a100"]
+      - ["p100"]
+      - ["v100"]
+      - ["rtx_a6000"]
+      - ["rtx_6000ada"]
+    value: "a100"
+
+  version:
+    label: Software Version
+    widget: select
+    options:
+      - ["1.4.0"]

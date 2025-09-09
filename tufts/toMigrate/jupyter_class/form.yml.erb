@@ -1,0 +1,51 @@
+---
+
+cluster: "pax"
+attributes:
+  conda_extensions: "0"
+  extra_jupyter_args: ""
+
+  course:
+    widget: select
+    label: "Course"
+    help: "The course you're taking"
+    options:
+      - [ "DSS", "dss" ]
+      - ["ECS62", "ecs62"]
+      - ["EE193", "ee193"]
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/reservation_class.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_memory.yml").indent(2) %>
+
+  gpu_checkbox:
+    widget: "check_box"
+    label: "Whether to request a GPU"
+    value: "0"
+
+  working_directory:
+    widget: "text_field"
+    label: "Top Working Directory"
+    help: "Top working directory for your Jupyter Notebook session to access your notebooks and data. If your files are stored in your lab directory, use \"/cluster/tufts/your_lab\" as the top working directory.Otherwise, you can use home directory \"/cluster/home/your_username\""
+    value: "/cluster/home/$USER"
+    
+  jupyterlab_switch:
+    widget: "check_box"
+    checked_value: 1
+    unchecked_value: 0
+    value: 0
+    label: Use JupyterLab instead of Jupyter Notebook?
+    help: |
+      JupyterLab is the next generation of Jupyter
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+  - course
+  - reservation
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - gpu_checkbox
+  - working_directory
+  - jupyterlab_switch

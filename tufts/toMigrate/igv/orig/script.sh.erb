@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# Clean the environment
+module purge
+
+# Set working directory to home directory
+cd "${HOME}"
+
+export IGV_DIRECTORY=<%= context.igv_directory %>
+echo $IGV_DIRECTORY
+
+#
+# Launch Fluxbox
+#
+
+module load fluxbox
+
+# Create Fluxbox root or it will override the below init file
+(
+  umask 077
+  mkdir -p "${HOME}/.fluxbox"
+)
+
+# Start the Fluxbox window manager (it likes to crash on occassion, make it
+# persistent)
+(
+until fluxbox -display "${DISPLAY}.0" -rc "<%= session.staged_root.join("fluxbox.rc") %>"; do
+    echo "Fluxbox crashed with exit code $?. Respawning..." >&2
+    sleep 1
+  done
+) &
+
+
+# Load the required environment
+module load java/1.8.0_60
+/cluster/tufts/bio/tools/igv/2.9.0/igv.sh --igvDirectory $IGV_DIRECTORY

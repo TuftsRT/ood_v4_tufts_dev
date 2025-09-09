@@ -1,0 +1,42 @@
+---
+cluster: "pax"
+
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - partition
+  - gpu_type 
+  - version
+  - modeldir
+  - datadir
+  
+attributes:
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+  version:
+    label: Version
+    widget: select
+    options:
+            - ["0.11.4"]
+
+  modeldir:
+    label: Model directory
+    widget: path_selector
+    value: "/cluster/tufts/hpc/tools/ollama/models"
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home
+
+  datadir:
+    label: "DATA_DIR"
+    widget: path_selector
+    directory: /cluster/tufts
+    help: "Specifies the base directory for storing data such as uploads, cache, and vector database files. If left unset, it defaults to **${HOME}/open-webui/data**."
+    favorites:
+      - /cluster/tufts
+      - /cluster/home

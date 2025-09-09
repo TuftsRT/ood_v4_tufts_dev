@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../javascript/files/page_load.js"],
+  "sourcesContent": ["\nexport function setPageLoadState() {\n  const configEle = document.getElementById('files_page_load_config');\n\n  if(configEle === null) {\n    return;\n  }\n\n  const data = configEle.dataset;\n\n  history.replaceState({\n    currentDirectory: data['currentDirectory'],\n    currentDirectoryUrl: data['currentDirectoryUrl'],\n    currentDirectoryUpdatedAt: data['currentDirectoryUpdatedAt'],\n    currentFilesPath: data['currentFilesPath'],\n    currentFilesUploadPath: data['currentFilesUploadPath'],\n    currentFilesystem: data['currentFilesystem']\n  }, null);\n}\n"],
+  "mappings": "AACO,SAASA,GAAmB,CACjC,IAAMC,EAAY,SAAS,eAAe,wBAAwB,EAElE,GAAGA,IAAc,KACf,OAGF,IAAMC,EAAOD,EAAU,QAEvB,QAAQ,aAAa,CACnB,iBAAkBC,EAAK,iBACvB,oBAAqBA,EAAK,oBAC1B,0BAA2BA,EAAK,0BAChC,iBAAkBA,EAAK,iBACvB,uBAAwBA,EAAK,uBAC7B,kBAAmBA,EAAK,iBAC1B,EAAG,IAAI,CACT",
+  "names": ["setPageLoadState", "configEle", "data"]
+}

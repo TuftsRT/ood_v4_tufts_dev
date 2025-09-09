@@ -1,0 +1,54 @@
+---
+cluster: "pax"
+
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - partition
+  - gpu_type 
+  - version
+  - modeldir
+  - datadir
+  - extra_parameters
+  
+attributes:
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+
+  version:
+    label: Version
+    widget: select
+    options:
+            - ["0.3.41"]
+            - ["0.3.51"]
+            - ["0.3.54"]
+
+  modeldir:
+    label: Model directory
+    widget: path_selector
+    value: "/cluster/tufts/hpc/tools/comfyui/models"
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home
+
+  datadir:
+    label: "DATA_DIR"
+    widget: path_selector
+    directory: /cluster/tufts
+    help: "Specifies the base directory for storing data such as uploads, cache, and vector database files. If left unset, it defaults to **${HOME}/comfyui/data**."
+    favorites:
+      - /cluster/tufts
+      - /cluster/home
+
+  extra_parameters:
+    widget: text_field
+    required: false
+    label: Extra command line arguments
+    value: "--use-sage-attention --disable-xformers --supports-fp8-compute --disable-smart-memory"
+    help: |
+            Extra command line arguments provided to main.py. 

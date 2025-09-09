@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Wait for the Matlab server to start
+echo "Waiting for Matlab server to open port ${port}..."
+if wait_until_port_used "${host}:${port}" 600; then
+  echo "Discovered Matlab server listening on port ${port}!"
+else
+  echo "Timed out waiting for Matlab server to open port ${port}!"
+  clean_up 1
+fi
+sleep 2
+

@@ -1,0 +1,22 @@
+<%
+  url = "http://#{host}.pax.tufts.edu:#{port}"
+%>
+
+<div class="alert alert-info mb-3">
+  <strong>First-time users:</strong> 
+  Follow these steps to get started with Ollama Open WebUI:
+  <br><br>
+  <ol>
+    <li>Click <strong>Connect to Ollama</strong>.</li>
+    <li>Click <strong>Get Started</strong>.</li>
+    <li>Create an <strong>Admin Account</strong>.</li>
+  </ol>
+  <small>
+    Your credentials are stored in the <code>DATA_DIR</code> you specified in the launch form. 
+    If you forget your credentials, simply delete the <code>DATA_DIR</code> folder and register a new account.
+  </small>
+</div>
+
+<a class="btn btn-primary" href="<%= url %>" target="_blank">
+  <i class="fa fa-eye"></i> Connect to Ollama
+</a>

@@ -1,0 +1,89 @@
+---
+
+cluster: "pax"
+
+attributes:
+  conda_extensions: "0"
+
+  extra_jupyter_args: ""
+
+#DM increase core# on 7/1/2022, change back to medium on 9/1/2022
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_memory.yml").indent(2) %>
+  version:
+    widget: select
+    label: "Jupyter, R, Python Version"
+    help: "This defines the version of Jupter you want to load."
+    options:
+      - [ "Jupyter 4.4.0 Python 2.7.14", "jupyter/1.0" ]
+      - [ "Jupyter 4.4.0 Python 3.7.1", "jupyter/3.0" ]
+      - [ "Jupyter 4.7.1 Python 3.8.8", "anaconda/2021.05" ]
+      - [ "Jupyter 6.5.7 Python 3.12.5", "miniforge/24.7.1-py312" ]
+      - [ "Jupyter 6.5.4 Python 3.11.4 - TuftsAI", "anaconda/2023.07.tuftsai" ]
+
+  gpu_checkbox:
+    widget: "check_box"
+    label: "Check this box to allocate a gpu"
+    value: "0"
+
+  gpu_partition:
+    widget: "select"
+    label: "Select preempt or normal gpu partition"
+    help: "NOTE: jobs submitted to the preempt partition may get automatically killed to allow higher priority jobs to run"
+    options:
+      - ["preempt", "preempt"]
+      - ["gpu", "gpu"]
+      - ["pettilab", "pettilab"]
+      - ["liulab", "liulab"]
+      - ["patralab", "patralab"]
+      - ["hugheslab", "hugheslab"]
+      - ["laolab", "laolab"]
+      - ["nonGPU", "batch"]
+    value: "batch"
+    
+  gpu_type:
+    label: "GPU Arch"
+    help: "Please select an architecture from the drop-down to allocate one GPU. gpu partition only provides A100-80GB and P100 GPUs."
+    widget: "select"
+    options:
+      - [ "P100 - 16GB", "p100" ]
+      - [ "v100 - 16GB", "v100" ]
+      - [ "A100 - 40GB", "a100_40" ]
+      - [ "A100 - 80GB", "a100_80" ]
+      - [ "T4 - 16GB", "t4" ]
+      - [ "RTX 6000 - 24GB", "rtx_6000" ]
+      - [ "RTX A6000 - 48GB", "rtx_a6000" ]     
+      - [ "RTX 6000Ada - 48GB", "rtx_6000ada" ]
+      - [ "L40S - 48GB", "l40s" ]
+      - [ "L40 - 48GB", "l40" ]
+      - [ "H100 - 80GB", "h100" ]
+
+  module:
+    widget: text_field
+    label: "Load Supporting Modules"
+    help: "ENTER module name ONLY.\n e.g. for \"module load cuda/12.2\" in command line, ENTER \"cuda/12.2\""
+  working_directory:
+    widget: "text_field"
+    label: "Top Working Directory"
+    help: "Top working directory for your Jupyter Notebook session to access your notebooks and data. If your files are stored in your lab directory, use \"/cluster/tufts/your_lab\" as the top working directory.Otherwise, you can use home directory \"/cluster/home/your_username\""
+    value: "/cluster/home/$USER"
+    
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/reservation.yml").indent(2) %>
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+#  - bc_account
+#  - bc_queue
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+  - gpu_checkbox
+  - gpu_partition
+  - gpu_type
+  - reservation
+  - working_directory
+#  - bc_num_slots
+#  - bc_email_on_started
+  - module

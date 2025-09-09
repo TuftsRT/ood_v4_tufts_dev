@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# sgd - 09/25/2020
+ulimit -c 0
+
+# Clean the environment
+module purge
+
+# Set working directory to home directory
+cd "${HOME}"
+
+#
+# Launch Xfce Window Manager and Panel
+#
+(
+  export SEND_256_COLORS_TO_REMOTE=1
+  export XDG_CONFIG_HOME="<%= session.staged_root.join("config") %>"
+  export XDG_DATA_HOME="<%= session.staged_root.join("share") %>"
+  export XDG_CACHE_HOME="$(mktemp -d)"
+  set -x
+  xfwm4 --compositor=off --daemon --sm-client-disable
+  xsetroot -solid "#D3D3D3"
+  xfsettingsd --sm-client-disable
+  xfce4-panel --sm-client-disable
+) &
+
+#
+# Start ABAQUS
+#
+
+# Load the required environment
+module load <%= context.version %>
+
+module load intel/2013_sp1
+
+# Launch ABAQUS
+#abq2016 cae -mesa
+# dm - 09/07/2021
+#abaqus cae -mesa
+xfce4-terminal -e "abaqus cae" --disable-server

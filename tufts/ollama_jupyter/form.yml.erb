@@ -1,0 +1,48 @@
+---
+
+cluster: "pax"
+bc_dynamic_js: true
+
+attributes:
+  conda_extensions: "0"
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+  version:
+    label: Version
+    widget: select
+    options:
+            - ["0.11.4"]
+
+  working_directory:
+    widget: path_selector
+    label: "Top Working Directory"
+    directory: /cluster/home
+    favorites:
+         - /cluster/tufts
+         - /cluster/home
+
+  modeldir:
+    label: Model directory
+    widget: path_selector
+    value: "/cluster/tufts/hpc/tools/ollama/models"
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home
+    help: |
+          A selection of commonly used models are available at `/cluster/tufts/hpc/tools/ollama/models` (managed by Research Technology).
+          You may also provide your own model path if preferred.
+
+form:
+  - conda_extensions
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+  - partition
+  - gpu_type
+  - working_directory
+  - modeldir

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# sgd - 09/25/2020
+ulimit -c 0
+
+# Clean the environment
+module purge
+
+# Set working directory to home directory
+cd "${HOME}"
+
+#
+# Launch Fluxbox
+#
+
+#export PATH="/opt/TurboVNC/bin:$PATH"
+#export WEBSOCKIFY_CMD="/cluster/tufts/rt/sdough01/experiment/websockify/run"
+
+module load fluxbox
+
+# Create Fluxbox root or it will override the below init file
+(
+  umask 077
+  mkdir -p "${HOME}/.fluxbox"
+)
+
+# Start the Fluxbox window manager (it likes to crash on occassion, make it
+# persistent)
+(
+until fluxbox -display "${DISPLAY}.0" -rc "<%= session.staged_root.join("fluxbox.rc") %>"; do
+    echo "Fluxbox crashed with exit code $?. Respawning..." >&2
+    sleep 1
+  done
+) &
+
+#
+# Start MAPLE
+#
+
+# Load the required environment
+module load <%= context.version %>
+
+# Launch MAPLE
+xmaple

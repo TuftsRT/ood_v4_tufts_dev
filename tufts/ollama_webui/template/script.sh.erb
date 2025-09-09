@@ -1,0 +1,96 @@
+#!/bin/bash
+set -euo pipefail
+
+# ================================
+# Configuration
+# ================================
+MODELDIR="<%= context.modeldir %>"
+DATA_DIR="<%= context.datadir %>"
+VER="<%= context.version %>"
+OLLAMA_SIF="/cluster/tufts/ngc/images/ollama_${VER}.sif"
+WEBUI_SIF="/cluster/tufts/ngc/images/open-webui_0.6.22.sif"
+WEBUI_PORT=$port
+
+# Trim whitespace and check if DATA_DIR is empty or unset
+if [ -z "$(echo "$DATA_DIR" | xargs)" ]; then
+    DATA_DIR="${HOME}/open-webui/data"
+fi
+
+mkdir -p "$DATA_DIR"
+
+KEY_FILE="${DATA_DIR}/.webui_secret_key"
+
+# ================================
+# Functions
+# ================================
+my_find_port() {
+    local host="127.0.0.1"
+    local min_port=49152
+    local max_port=65535
+
+    for port in $(shuf -i ${min_port}-${max_port}); do
+        if ! nc -z "$host" "$port" 2>/dev/null; then
+            echo "$port"
+            return 0
+        fi
+    done
+
+    echo "❌ Failed to find available port in range ${min_port}-${max_port}" >&2
+    return 1
+}
+
+# ================================
+# Environment Setup
+# ================================
+module purge
+module load apptainer
+#module load miniforge
+module list
+
+mkdir -p "$DATA_DIR"
+
+# ================================
+# Launch Ollama Backend
+# ================================
+ollama_port=$(my_find_port)
+if [[ -z "$ollama_port" ]]; then
+    echo "❌ Could not allocate a port for Ollama"
+    exit 1
+fi
+
+export OLLAMA_HOST="127.0.0.1:${ollama_port}"
+export OLLAMA_MODELS="$MODELDIR"
+
+echo "📡 OLLAMA_HOST: $OLLAMA_HOST"
+echo "📁 OLLAMA_MODELS: $OLLAMA_MODELS"
+
+singularity run \
+    --nv \
+    --env "OLLAMA_HOST=$OLLAMA_HOST" \
+    --env "OLLAMA_MODELS=$OLLAMA_MODELS" \
+    "$OLLAMA_SIF" &
+
+ollama_pid=$!
+
+#
+sleep 20
+
+# ================================
+# Prepare WebUI Key
+# ================================
+if [[ ! -f "$KEY_FILE" ]]; then
+    echo "Generating WEBUI_SECRET_KEY"
+    head -c 12 /dev/random | base64 > "$KEY_FILE"
+fi
+export WEBUI_SECRET_KEY=$(cat "$KEY_FILE")
+
+# ================================
+# Start Open WebUI Frontend
+# ================================
+export OLLAMA_API_BASE_URL="http://127.0.0.1:${ollama_port}"
+export DATA_DIR="$DATA_DIR"
+
+#conda activate /cluster/tufts/hpc/tools/miniforge3/envs/envs/open-webui_0.6.5/
+
+echo "🚀 Starting Open WebUI on port $WEBUI_PORT"
+singularity exec --nv $WEBUI_SIF open-webui serve --port "$WEBUI_PORT"

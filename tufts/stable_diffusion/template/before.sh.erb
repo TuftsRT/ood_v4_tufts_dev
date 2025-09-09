@@ -1,0 +1,12 @@
+# Generate and export your password
+create_passwd() {
+  tr -dc A-Za-z0-9 </dev/urandom | head -c "${1:-16}" || true
+}
+
+host=$(hostname)
+port=$(find_port)
+PASSWORD=$(create_passwd 16)
+
+export host="$host"
+export password="$PASSWORD"
+

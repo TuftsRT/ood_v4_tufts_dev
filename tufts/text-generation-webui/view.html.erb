@@ -1,0 +1,14 @@
+<% 
+  url = "http://#{host}\.pax\.tufts\.edu:#{port}"
+
+  user = ENV['USER']
+  
+  password_run = "#{password}"
+%>
+
+<a class="btn btn-primary" href="<%= url %>" target="_blank">
+  <i class="fa fa-eye"></i> Connect to Diffusion
+</a>
+
+<p><strong>Username:</strong> <code><%= user %></code></p>
+<p><strong>Password:</strong> <code><%= password %></code></p>

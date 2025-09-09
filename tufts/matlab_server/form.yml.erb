@@ -1,0 +1,38 @@
+---
+cluster: "pax"
+form:
+  - partition
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+  - module
+  - reservation
+
+attributes:
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/cpu_partition.yml").indent(2) %>
+<%- if ["jni03", "mpower11", "ymalon01","kokano02"].include? ENV["USER"] %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_memory.yml").indent(2) %>
+<%- elsif system("groups $USER | grep -i aldridgelab >/dev/null 2>&1") %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/aldridgelab/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/aldridgelab/num_memory.yml").indent(2) %>
+<%- else %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/xlarge/num_cores.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/large/num_memory.yml").indent(2) %>
+<%- end -%>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/reservation.yml").indent(2) %>
+
+  version:
+    widget: select
+    label: "Matlab version"
+    help: "This defines the version of Matlab you want to load."
+    options:
+      - [ "R2025a", "matlab/R2025a matlab-proxy/0.25.1" ]
+  module:
+    widget: text_field
+    label: "Load Supporting Modules"
+    help: "ENTER module name ONLY.\n e.g. for \"module load OpenSees/2.5.0 gcc/7.3.0\" in command line, ENTER \"OpenSees/2.5.0 gcc/7.3.0\""
+
+

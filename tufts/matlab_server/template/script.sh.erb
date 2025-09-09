@@ -1,0 +1,11 @@
+#!/bin/bash
+
+module purge
+module restore
+
+module load <%= context.version %>
+
+module load <%= context.module %>
+module list
+cd $HOME
+matlab-proxy-app

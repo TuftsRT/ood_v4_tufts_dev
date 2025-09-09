@@ -1,0 +1,21 @@
+# Job submission configuration file
+#
+---
+
+batch_connect:
+  template: "vnc"
+
+#
+# sgd - 11/02/2018
+#
+script:
+  email_on_started: true
+  email_on_terminated: true
+  email: <%= ENV["USER"] %>@tufts.edu
+  job_name: "OnDemand/FastQC"
+  native:
+    - "--time=<%= bc_num_hours %>:00:00"
+    - "--mem=<%= num_memory %>G"
+    - "--nodes=1"
+    - "--ntasks=<%= num_cores %>"
+    - "--partition=<%= partition %>"

@@ -1,0 +1,31 @@
+# Job submission configuration file
+---
+batch_connect:
+  template: "basic"
+
+script:
+  native:
+    - "--time"
+    - "<%= bc_num_hours %>:0:0"
+    - "-n"
+    - "<%= num_cores %>"
+    - "--mem"
+    - "<%= num_memory %>"
+    <%- if gpu_checkbox == "1" && reservation == "oodres" -%>
+    - "--gres=gpu:1"
+    - "-p"
+    - "gpu"
+    <%- elsif gpu_checkbox == "1" && reservation != "oodres" -%>
+    - "--gres=gpu:1"
+    - "--reservation=<%= reservation %>"
+    <%- elsif reservation == "ecs62" -%>
+    - "-p"
+    - "pangolinlab"
+    <%- elsif reservation == "oodres" -%>
+    - "-p"
+    - "batch"
+    - "--constrain=rhel8"
+    - "--exclude=d1cmp021"
+    <%- else -%>
+    - "--reservation=<%= reservation %>"
+    <%- end -%>

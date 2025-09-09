@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# =========================
+# Environment & Directories
+# =========================
+<% branch = context.branch.to_s.strip.empty? ? "main" : context.branch %>
+
+cd <%= context.git_repo %>
+git fetch --tags
+git checkout <%= branch %>
+
+# Only pull if it's a branch (not a tag)
+if git show-ref --verify --quiet refs/heads/<%= branch %>; then
+    git pull
+fi
+# =========================
+# Load Modules
+# =========================
+module purge
+module load singularity
+module list
+
+
+# =========================
+# Clean previous build
+# =========================
+#
+
+# Clean
+rm -rf build
+rm -rf jupyter_execute
+rm -rf source/tags
+
+# =========================
+# New build
+# =========================
+#
+singularity exec /cluster/tufts/apps/container/biocontainers/images/guides_tools_1.0.1.sif sphinx-autobuild --nitpicky \
+  --ignore source/tags \
+  --host 0.0.0.0 \
+  --port $port \
+  -- \
+  source build 

@@ -1,0 +1,4 @@
+function o(t){let e=s(t);document.getElementById("main_container").prepend(e),e.scrollIntoView({behavior:"smooth"})}function s(t){let e=document.createElement("span");e.innerText=t;let n=document.createElement("div");return n.classList.add("alert","alert-danger","alert-dismissible"),n.setAttribute("role","alert"),n.appendChild(e),n.appendChild(a()),n}function a(){let t=document.createElement("button");t.classList.add("btn-close"),t.dataset.bsDismiss="alert";let e=document.createElement("span");return e.classList.add("sr-only"),e.innerText="Close",t.appendChild(e),t}export{o as alert};
+//# sourceMappingURL=/pun/sys/dashboard/assets/alert.js-63ef1fe5ec1b2bc6cf87bade138f13a5678012a9875405fb6a82dde63abe4574.map
+//!
+;

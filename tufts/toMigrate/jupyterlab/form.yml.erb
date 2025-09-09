@@ -1,0 +1,45 @@
+---
+
+cluster: "pax"
+
+attributes:
+
+  conda_extensions: "0"
+
+  extra_jupyter_args: ""
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/small/num_cores.yml").indent(2) %>
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/large/num_memory.yml").indent(2) %>
+
+  version:
+    widget: select
+    label: "Jupyter, R, Python Version"
+    help: "This defines the version of Jupter you want to load."
+    options:
+      - [ "Jupyter 4.4.0 Python 2.7.14", "jupyter/1.0" ]
+      - [ "Jupyter 4.4.0 Python 3.7.1", "jupyter/3.0" ]
+  working_directory:
+    widget: "text_field"
+    label: "Top Working Directory"
+    help: "Top working directory for your Jupyter Notebook session to access your notebooks and data. If your files are stored in your lab directory, use \"/cluster/tufts/your_lab\" as the top working directory.Otherwise, you can use home directory \"/cluster/home/your_username\""
+    value: "/cluster/home/$USER"
+    
+
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/reservation.yml").indent(2) %>
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+#  - bc_account
+#  - bc_queue
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+  - reservation
+#  - bc_num_slots
+#  - bc_email_on_started
+  - working_directory
+

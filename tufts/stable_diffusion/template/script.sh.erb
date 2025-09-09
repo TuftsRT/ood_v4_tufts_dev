@@ -1,0 +1,60 @@
+#!/bin/bash
+
+OUTDIR=<%= context.outdir %>
+CACHEDIR=$OUTDIR/cache
+MODELDIR=<%= context.modeldir %>
+VER=<%= context.version %>
+CONFIG="$PWD/config.json"
+IMAGE="/cluster/tufts/ngc/images/stable-diffusion-webui-docker-${VER}.sif"
+export AppRepo="/cluster/tufts/hpc/tools/stable-diffusion-webui"
+PROGRAM="/app/stable-diffusion-webui/webui.sh"
+
+## Update output directories
+keys=(
+  "outdir_samples"
+  "outdir_txt2img_samples"
+  "outdir_img2img_samples"
+  "outdir_extras_samples"
+  "outdir_grids"
+  "outdir_txt2img_grids"
+  "outdir_img2img_grids"
+  "outdir_save"
+  "outdir_init_images"
+)
+
+for key in "${keys[@]}"; do
+  sed -i.bak "s#\"$key\": \".*\"#\"$key\": \"$OUTDIR\"#" "$CONFIG"
+done
+
+module purge
+module load singularity
+module list
+mkdir -p $CACHEDIR
+
+# Confirming port and host
+echo "Using port: $port"
+echo "Running on host: $host"
+
+singularity exec \
+  -B "${AppRepo}:/app/stable-diffusion-webui" \
+  -B "${MODELDIR}:/app/stable-diffusion-webui/models/Stable-diffusion" \
+  -B "${CACHEDIR}: /app/stable-diffusion-webui/cache" \
+  --nv "$IMAGE" bash -c '
+    find /app/stable-diffusion-webui -type d -name .git | while read gitdir; do
+      repo_dir=$(dirname "$gitdir")
+      git config --global --add safe.directory "$repo_dir"
+    done &&
+
+    /app/stable-diffusion-webui/webui.sh  \
+      --port "'"$port"'" \
+      --listen \
+      --skip-install \
+      --api \
+      --api-auth "'"$USER:$password"'" \
+      --gradio-auth "'"$USER:$password"'" \
+      --cors-allow-origins "*.pax.tufts.edu" \
+      --server-name "'"$host"'" \
+      --no-half \
+      --no-prompt-history \
+      --ui-settings-file "'"$CONFIG"'"
+  '

@@ -1,0 +1,52 @@
+---
+
+cluster: "pax"
+
+attributes:
+  conda_extensions: "0"
+  extra_jupyter_args: ""
+
+  cpu_partition:
+    widget: "select"
+    label: "Select cpu partition"
+    help: "NOTE: Selecting partition is optional. Please do not choose specific lab partitions if you are not a member of that lab."
+    value: "batch"
+    options:
+      - ["batch","batch"]
+      - ["largemem", "largemem"]
+      - ["preempt", "preempt"]
+      - ["patralab", "patralab"]
+
+  num_cores:
+    widget: "select"
+    label: "Number of cores"
+    options:
+      - ["3", "3"]
+      - ["4", "4"]
+      - ["6", "6"]
+      - ["8", "8"]
+      - ["10", "10"]
+      - ["12", "12"]
+      - ["16", "16"]
+      - ["24", "24"]
+    id: 'num_cores'
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/large/num_memory.yml").indent(2) %>
+
+  working_directory:
+    widget: "text_field"
+    label: "Top Working Directory"
+    help: "Top working directory for your Jupyter Notebook session to access your notebooks and data. If your files are stored in your lab directory, use \"/cluster/tufts/your_lab\" as the top working directory.Otherwise, you can use home directory \"/cluster/home/your_username\""
+    value: "/cluster/home/$USER"
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/reservation.yml").indent(2) %>
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+  - bc_num_hours
+  - cpu_partition
+  - num_cores
+  - num_memory
+  - reservation
+  - working_directory

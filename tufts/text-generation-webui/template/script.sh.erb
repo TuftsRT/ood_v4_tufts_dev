@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# =========================
+# Environment & Directories
+# =========================
+MODELDIR=<%= context.modeldir %>
+VER="<%= context.version %>"
+USER_DATA="<%= context.user_data %>"
+# If USER_DATA is empty or unset, use default path
+if [ -z "$USER_DATA" ]; then
+  USER_DATA="$HOME/text-generation-webui/user_data"
+fi
+mkdir -p $USER_DATA
+cp -r /cluster/tufts/apps/container/ngc/ai/text-generation-webui/user_data/* $USER_DATA/
+
+WEBUI_REPO="/cluster/tufts/hpc/tools/text-generation-webui"
+IMAGE="/cluster/tufts/apps/container/ngc/images/text-generation-webui_${VER}.sif"
+CONFIG="$PWD/config.json"
+PROGRAM="/opt/text-generation-webui/start_linux.sh"
+
+
+# =========================
+# Load Modules
+# =========================
+module purge
+module load singularity
+module list
+
+# =========================
+# Logging Info
+# =========================
+echo "🔌 Using port: $port"
+echo "🌐 Running on host: $host"
+echo "📁 Model dir: $MODELDIR"
+echo "📦 User Data dir: $USER_DATA"
+# =========================
+# Run the Container
+# =========================
+singularity run --nv \
+  --bind "$USER_DATA:/opt/text-generation-webui/user_data" \
+  --bind "$MODELDIR:/opt/text-generation-webui/user_data/models" \
+  "$IMAGE" \
+  $PROGRAM \
+  --listen \
+  --listen-port "$port" \
+  --listen-host "$host" \
+  --gradio-auth "$USER:$password" \
+  --verbose

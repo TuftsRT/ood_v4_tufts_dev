@@ -1,0 +1,29 @@
+# Job submission configuration file
+#
+---
+
+batch_connect:
+  template: "basic"
+  
+script:
+  email_on_started: true
+  email_on_terminated: true
+  email: <%= ENV["USER"] %>@tufts.edu
+  job_name: "OnDemand/jupyter_bioinfo"
+  native:
+    - "--time"
+    - "<%= bc_num_hours %>:0:0"
+    - "--mem"
+    - "<%= num_memory %>"
+    - "--nodes"
+    - "<%= 1 %>"
+    - "-n"
+    - "<%= num_cores %>"
+    <%- if num_cores.to_i >=8||num_memory.to_i >= 16000 -%>
+    - "-p"
+    - "<%= cpu_partition %>"
+    - "--constrain=rhel8"
+    <%- else -%>
+    - "--reservation"
+    - "<%= reservation %>"
+    <%- end -%>                   

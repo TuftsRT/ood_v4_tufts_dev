@@ -1,0 +1,7 @@
+---
+name: ilastik
+category: Bioinformatics Apps
+subcategory: Apps
+role: batch_connect
+description: |
+  This app will launch [ilastik](https://www.ilastik.org)'s gpu version.

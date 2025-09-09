@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# Stop script on any error, undefined variable, or pipe failure
+set -euo pipefail
+
+# Load the specified code-server module environment
+echo "INFO: Loading code-server module: <%= context.version %>"
+module purge
+module load <%= context.version %>
+echo "INFO: Modules loaded:"
+module list 2>&1
+
+# Verify that the code-server command is now available
+if ! command -v code-server &> /dev/null; then
+  echo "ERROR: 'code-server' command not found after loading module. Aborting." >&2
+  exit 1
+fi
+
+# Configure a version-specific directory for persistent user data and settings
+DATA_DIR="$HOME/.local/share/code-server/<%= context.version %>"
+EXTENSIONS_DIR="${DATA_DIR}/extensions"
+mkdir -p "${EXTENSIONS_DIR}"
+echo "INFO: Using data directory: ${DATA_DIR}"
+
+
+# Launch the code-server process
+echo "INFO: Starting code-server..."
+echo "  - Host: ${host}"
+echo "  - Port: ${port}"
+echo "  - Compute Node: $(hostname)"
+
+# Execute code-server with secure settings
+# --auth password: Enforces password authentication using the $PASSWORD environment variable.
+# --bind-addr: Binds to the address and port provided by Open OnDemand.
+# --user-data-dir / --extensions-dir: Sets paths for persistent data.
+code-server \
+  --auth none \
+  --bind-addr "0.0.0.0:${port}" \
+  --user-data-dir "${DATA_DIR}" \
+  --extensions-dir "${EXTENSIONS_DIR}" \
+  --disable-telemetry \
+  --disable-update-check $HOME

@@ -1,0 +1,45 @@
+---
+cluster: "pax"
+
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - partition
+  - gpu_type 
+  - version
+  - outdir
+  - modeldir
+  
+attributes:
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+  version:
+    label: Version
+    widget: select
+    options:
+          - ["1.10.1"]
+
+  outdir:
+    label: Output directory
+    widget: path_selector
+    directory: /cluster/tufts
+    required: true
+    favorites:
+      - /cluster/tufts
+      - /cluster/home 
+
+  modeldir:
+    label: Model directory
+    widget: path_selector
+    value: "/cluster/tufts/hpc/tools/stable-diffusion-webui/models/Stable-diffusion"
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home 
+    help: |
+          A selection of commonly used models are available at `/cluster/tufts/hpc/tools/stable-diffusion-webui/models/Stable-diffusion`.  
+          You may also provide your own model path if preferred.

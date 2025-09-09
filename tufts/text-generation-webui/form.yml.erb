@@ -1,0 +1,46 @@
+---
+cluster: "pax"
+
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - partition
+  - gpu_type 
+  - version
+  - modeldir
+  - user_data
+  
+attributes:
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+  version:
+    label: Version
+    widget: select
+    options:
+          - ["3.10"]
+
+  modeldir:
+    label: Model directory
+    widget: path_selector
+    value: "/cluster/tufts/hpc/tools/text-generation-webui/models"
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home 
+    help: |
+          A selection of commonly used models are available at `/cluster/tufts/hpc/tools/text-generation-webui/models`.  
+          You may also provide your own model path if preferred.
+
+  user_data:
+    label: User Data directory
+    widget: path_selector
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home 
+    help: |
+          Default is **$HOME/text-generation-webui/user_data**.

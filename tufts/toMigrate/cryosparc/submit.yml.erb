@@ -1,0 +1,25 @@
+# Job submission configuration file
+#
+---
+
+batch_connect:
+  template: "vnc"
+
+#
+# sgd - 11/02/2018
+#
+script:
+  native:
+    - "--time"
+    - "<%= bc_num_hours %>:0:0"
+    - "--nodes"
+    - "1"
+    - "-n"
+    - "<%= num_cores %>"
+    - "--mem"
+    - "<%= num_memory %>G"
+    - "--partition=heldweinlab"
+    <% if num_generic_gpus > "0" %>
+    - "--gres=gpu:<%= num_generic_gpus %>"
+    <% end %>
+

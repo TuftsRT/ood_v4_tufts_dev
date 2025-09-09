@@ -1,0 +1,8 @@
+---
+name: "text-generation-webui"
+category: "Interactive Apps"
+subcategory: "AI"
+role: "batch_connect"
+description: |
+  This app launches a [text-generation-webui](https://github.com/oobabooga/text-generation-webui)
+  for use on Tufts HPC. 

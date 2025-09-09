@@ -1,0 +1,67 @@
+---
+
+cluster: "pax"
+
+attributes:
+  conda_extensions: "0"
+
+  extra_jupyter_args: ""
+
+  num_cores:
+    widget: "select"
+    label: "Number of cores"
+    help: |
+      Number of cores.
+    options:
+      - ["1", "1"]
+      - ["2", "2"]
+      - ["4", "4"]
+      - ["8", "8"]
+      - ["16", "16"]
+      - ["32", "32"]
+      - ["74", "74"]
+
+  num_memory:
+    widget: "select"
+    label: "Amount of memory"
+    help: |
+      Amount of memory (in GB).
+    options:
+      - ["1GB", "1000"]
+      - ["2GB", "2000"]
+      - ["4GB", "4000"]
+      - ["8GB", "8000"]
+      - ["16GB", "16000"]
+      - ["32GB", "32000"]
+      - ["64GB", "64000"]
+      - ["128GB", "128000"]
+      - ["256GB", "256000"]
+
+  version:
+    widget: select
+    label: "Jupyter, R, Python Version"
+    help: "This defines the version of Jupter you want to load."
+    options:
+      - [ "Jupyter 4.4.0 R 3.4.2 Python 2.7.14", "jupyter/1.0" ]
+      - [ "Jupyter 4.4.0 R 3.5.1 Python 3.7.1", "jupyter/3.0" ]
+
+  reservation:
+    widget: select
+    label: "Reservation for class, training, workshop"
+    help: "If you don't know about specific reservation, select default."
+    options:
+      - [ "Default", "default" ]
+      - [ "Bioinformatics Workshop", "bioworkshop" ]
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+#  - bc_account
+#  - bc_queue
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+  - reservation
+#  - bc_num_slots
+#  - bc_email_on_started

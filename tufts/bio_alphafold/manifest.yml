@@ -1,0 +1,10 @@
+---
+name: AlphaFold
+category: Interactive Apps
+subcategory: Bioinformatics
+role: batch_connect
+description: |
+  This app will launch [AlphaFold] on [Tufts HPC].
+
+  [AlphaFold]: https://github.com/deepmind/alphafold
+  [Tufts HPC]: https://it.tufts.edu/high-performance-computing

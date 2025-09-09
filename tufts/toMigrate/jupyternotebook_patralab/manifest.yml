@@ -1,0 +1,9 @@
+---
+name: Jupyter Notebook Patra Lab
+category: Interactive Apps
+subcategory: Apps
+role: batch_connect
+description: |
+  This app will launch a Jupyter Notebook server on one or more nodes.
+  Resources are sized for most purposes. Email email tts-research@tufts.edu if 
+  larger capacity is needed.

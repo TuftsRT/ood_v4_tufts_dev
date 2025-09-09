@@ -1,0 +1,59 @@
+---
+
+cluster: "pax"
+
+bc_dynamic_js: true
+
+attributes:
+  conda_extensions: "0"
+
+  extra_jupyter_args: ""
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+    
+
+  course:
+    widget: select
+    label: "Course"
+    help: "The course you're taking"
+    options:
+      - [ "DSS", "dss" ]
+      - ["ECS61", "ecs62"]
+      - ["EE110", "ee110"]
+      - ["EE193", "ee193"]
+
+
+  working_directory:
+    widget: "text_field"
+    label: "Top working directory"
+    help: Top working directory for your Jupyter session to access your notebooks and data. Default is your **$HOME**.
+    
+  mode:
+    widget: "radio"
+    label: "Jupyter Lab or Notebook?"
+    value: "1"
+    options:
+      - ["Jupyter Lab", "1"]
+      - ["Jupyter Notebook", "0"]
+
+  module:
+    widget: text_field
+    label: "Load supporting modules"
+    help: ENTER module name **ONLY**. e.g. for "module load cuda/12.9" in command line, ENTER **cuda/12.2**
+
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+  - mode
+  - course
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - partition
+  - gpu_type
+  - working_directory
+  - module

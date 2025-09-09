@@ -1,0 +1,25 @@
+<% require 'securerandom' %>
+<% password = SecureRandom.hex(12) %>
+<% host = `hostname`.strip %>
+
+batch_connect:
+  template: "basic"
+  conn_params:
+    - working_path
+
+script:
+  email_on_started: true
+  email_on_terminated: true
+  email: <%= ENV["USER"] %>@tufts.edu
+  before_script: "before.sh.erb"
+  script: "script.sh.erb"
+
+  native:
+    - "--time"
+    - "<%= bc_num_hours %>:0:0"
+    - "-n"
+    - "<%= num_cores %>"
+    - "--nodes"
+    - "1"
+    - "-p"
+    - "batch"
