@@ -1,0 +1,31 @@
+---
+cluster: "pax"
+form:
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - bc_vnc_resolution
+  - partition
+  - version
+  - igv_directory
+
+attributes:
+  bc_vnc_resolution:
+    required: true
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/cpu_partition.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+
+  version:
+    widget: "select"
+    label: "IGV Version"
+    help: "Select the desired IGV version."
+    options:
+      - ["2.19.6", "igv/2.19.6"]
+
+  igv_directory:
+    widget: "text_field"
+    label: "Directory"
+    help: "Directory for igv genomes, leave blank if you'd like to create an igv directory in your home directory, or use the directory /cluster/tufts/bio/tools/igv/igv_home/ which has many genomes stored."
+    value: "/cluster/tufts/bio/tools/igv/igv_home/"

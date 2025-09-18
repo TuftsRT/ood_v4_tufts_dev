@@ -1,0 +1,8 @@
+---
+name: IGV 
+category: Interactive Apps
+subcategory: Apps
+role: batch_connect
+description: |
+  This app will launch a [IGV] GUI on the [Tufts HPC cluster]. You will be able
+  to interact with the IGV GUI through a VNC session.
