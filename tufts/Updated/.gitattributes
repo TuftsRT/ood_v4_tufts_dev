@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# Since I am working on a windows device, my files will automatically use
+# use Carriage Return Line Feed (CRLF) line endings instead of Line Feed 
+# (LF) line endings (Linux, Mac). Here I am setting my line endings back
+# to lf (this .gitattributes will apply to every file in this directory 
+# level) to avoid any potential issues.
