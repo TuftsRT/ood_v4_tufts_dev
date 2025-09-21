@@ -1,0 +1,9 @@
+body {
+    background-color: red;
+    font-size: 100px;
+}
+
+.test {
+    color: yellow;
+    font-weight: bold;
+}
