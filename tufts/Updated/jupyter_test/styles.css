@@ -1,9 +1,9 @@
 body {
-    background-color: red;
-    font-size: 100px;
+    background-color: red !important;
+    font-size: 100px !important;
 }
 
 .test {
-    color: yellow;
-    font-weight: bold;
+    color: yellow !important;
+    font-weight: bold !important;
 }
