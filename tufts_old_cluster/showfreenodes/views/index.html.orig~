@@ -1,0 +1,3 @@
+<h2>Using layout: {{date}}</h2>
+<b><pre>{{output}}</pre></b>
+

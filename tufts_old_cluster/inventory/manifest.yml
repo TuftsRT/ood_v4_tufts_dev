@@ -1,0 +1,5 @@
+name: Inventory
+category: Misc
+description: System Inventory.
+icon: fa://gear
+role: inventory
