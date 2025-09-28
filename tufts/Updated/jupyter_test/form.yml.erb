@@ -1,0 +1,103 @@
+---
+cluster: "pax"
+bc_dynamic_js: true
+
+attributes:
+  conda_extensions: "0"
+  extra_jupyter_args: ""
+  
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+
+  global_components:
+    widget: "text_field"
+    value: ""
+    help: |
+      <style>
+        <%= File.read("/cluster/home/wgoldm03/ondemand/prod/global_css/base.css").indent(6) %>
+        <%= File.read("/cluster/home/wgoldm03/ondemand/prod/global_css/buttons.css").indent(6) %>
+        <%= File.read("/cluster/home/wgoldm03/ondemand/prod/global_css/tooltip.css").indent(6) %>
+        <%= File.read("/cluster/home/wgoldm03/ondemand/prod/global_css/form.css").indent(6) %>
+        <%= File.read("/cluster/home/wgoldm03/ondemand/prod/global_css/jupyter.css").indent(6) %>
+      </style>
+
+  working_directory:
+    widget: "text_field"
+    label: "Top working directory"
+    help: Top working directory for your Jupyter session to access your notebooks and data. Default is your **$HOME**.
+
+  module:
+    widget: "text_field"
+    label: "Load supporting modules"
+    help: ENTER module name **ONLY**. e.g. for "module load cuda/12.9" in command line, ENTER **cuda/12.9**
+
+  bc_num_hours:
+    <%= ERB.new(File.read("/cluster/home/wgoldm03/ondemand/prod/global_components/tooltip.yml.erb"))
+      .result_with_hash(tooltip_text: "Amount of time you believe the program will need.") %>
+
+
+  num_cores:
+    label: "Num Cores"
+    widget: "number_field"
+    value: 1
+    min: 1
+    max: 64
+    <%= ERB.new(File.read("/cluster/home/wgoldm03/ondemand/prod/global_components/tooltip.yml.erb"))
+      .result_with_hash(tooltip_text: "Select the number of CPU cores for your job. Most jobs use 1-4.") %>
+
+  num_memory:
+    <%= ERB.new(File.read("/cluster/home/wgoldm03/ondemand/prod/global_components/tooltip.yml.erb"))
+      .result_with_hash(tooltip_text: "Enter the memory amount in GB (e.g., 12 for 12GB or 100 for 100GB).") %>
+
+  mode:
+    widget: "radio"
+    label: "Jupyter Lab or Notebook?"
+    value: "1"
+    options:
+      - ["Jupyter Lab", "1"]
+      - ["Jupyter Notebook", "0"]
+    help: |
+      <script>
+        const label = document.querySelector('label[for="batch_connect_session_context_mode_1"]');
+        const label1 = document.querySelector('label[for="batch_connect_session_context_mode_0"]');
+
+        if (label && label1) {
+          label.innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Jupyter_logo.svg/1767px-Jupyter_logo.svg.png" alt="jupyter" class="img_icon">`;
+          label1.innerHTML = `<img src="https://user-images.githubusercontent.com/7244206/224844987-30e9b7c5-abb1-416d-9e3d-63dc8ce9d532.png" alt="jupyter_lab" class="img_icon">`;
+        }
+      </script>
+
+  working_directory_path:
+    widget: "path_selector"
+    label: "📁 Select Working Directory"
+    help: |
+      <div class="resource-item">
+        <div class="resource-label">
+          <i class="fas fa-folder-open"></i>
+          Working Directory
+        </div>
+        <p>Browse and select your working directory using the built-in path selector.</p>
+      </div>
+    directory: "<%= ENV['HOME'] %>"
+    show_hidden: false
+    show_files: false
+    favorites:
+      - "<%= ENV['HOME'] %>"
+      - "<%= ENV['HOME'] %>/projects"
+      - "/tmp"
+
+form:
+  - conda_extensions
+  - extra_jupyter_args
+  - global_components
+  - mode
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - partition
+  - gpu_type
+  - working_directory
+  - working_directory_path
+  - module
