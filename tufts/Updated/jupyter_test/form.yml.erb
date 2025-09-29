@@ -2,13 +2,80 @@
 cluster: "pax"
 bc_dynamic_js: true
 
+<%
+# -----------------
+# GPU dynamic logic
+# -----------------
+require 'open3'
+require 'set'
+
+def capture_stdout(cmd)
+  stdout, status = Open3.capture2(cmd)
+  status.success? ? stdout : ''
+end
+
+nodes_out = capture_stdout('scontrol show node --oneliner')
+
+detected_types = Set.new
+a100_sizes     = Set.new
+
+nodes_out.each_line do |line|
+  if (m = line.match(/\bGres=gpu:(\w+)/))
+    type = m[1]
+    detected_types << type if type && type != 'null'
+  end
+
+  feats_available = line[/\bAvailableFeatures=(\S+)/, 1]
+  feats_active    = line[/\bActiveFeatures=(\S+)/, 1]
+  feats_legacy    = line[/\bFeature(?:s)?=(\S+)/, 1]
+  feats = [feats_available, feats_active, feats_legacy].compact.join(',')
+  a100_sizes << 'a100_40' if feats.include?('a100-40G')
+  a100_sizes << 'a100_80' if feats.include?('a100-80G')
+end
+
+dynamic_failed = detected_types.empty?
+detected_types.delete('a100') unless a100_sizes.empty?
+
+label_map = {
+  'h200'        => 'H200 - 140GB',
+  'h100'        => 'H100 - 80GB',
+  'a100'        => 'A100',
+  'a100_40'     => 'A100 - 40GB',
+  'a100_80'     => 'A100 - 80GB',
+  'l40s'        => 'L40S - 48GB',
+  'l40'         => 'L40 - 48GB',
+  'rtx_6000ada' => 'RTX 6000Ada - 48GB',
+  'rtx_a6000'   => 'RTX A6000 - 48GB',
+  'rtx_6000'    => 'RTX 6000 - 24GB',
+  'v100'        => 'v100 - 16GB',
+  'p100'        => 'P100 - 16GB',
+  't4'          => 'T4 - 16GB'
+}
+
+order = %w[h200 h100 a100_80 a100_40 a100 l40s l40 rtx_6000ada rtx_a6000 rtx_6000 v100 p100 t4]
+priority = order.each_with_index.to_h
+
+options = []
+options << ['none', 'none']
+options << ['any',  'any']
+options << [label_map['a100_40'], 'a100_40'] if a100_sizes.include?('a100_40')
+options << [label_map['a100_80'], 'a100_80'] if a100_sizes.include?('a100_80')
+
+remaining = detected_types.to_a
+remaining.sort_by! { |t| priority.fetch(t, 999) }
+remaining.each do |t|
+  next if %w[a100_40 a100_80].include?(t)
+  label = label_map[t] || t.upcase
+  options << [label, t]
+end
+%>
+
 attributes:
   conda_extensions: "0"
   extra_jupyter_args: ""
   
 <%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_cores_generic.yml").indent(2) %>
 <%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/num_memory_generic.yml").indent(2) %>
-<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/gpu_type.yml").indent(2) %>
 <%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
 
   global_components:
@@ -34,12 +101,12 @@ attributes:
     help: ENTER module name **ONLY**. e.g. for "module load cuda/12.9" in command line, ENTER **cuda/12.9**
 
   bc_num_hours:
+    label: "# Hours"
     <%= ERB.new(File.read("/cluster/home/wgoldm03/ondemand/prod/global_components/tooltip.yml.erb"))
       .result_with_hash(tooltip_text: "Amount of time you believe the program will need.") %>
 
-
   num_cores:
-    label: "Num Cores"
+    label: "# Cores"
     widget: "number_field"
     value: 1
     min: 1
@@ -48,6 +115,7 @@ attributes:
       .result_with_hash(tooltip_text: "Select the number of CPU cores for your job. Most jobs use 1-4.") %>
 
   num_memory:
+    label: "GB Memory"
     <%= ERB.new(File.read("/cluster/home/wgoldm03/ondemand/prod/global_components/tooltip.yml.erb"))
       .result_with_hash(tooltip_text: "Enter the memory amount in GB (e.g., 12 for 12GB or 100 for 100GB).") %>
 
@@ -87,6 +155,15 @@ attributes:
       - "<%= ENV['HOME'] %>"
       - "<%= ENV['HOME'] %>/projects"
       - "/tmp"
+
+  gpu_type:
+    widget: "select"
+    label: "GPU architecture"
+    help: "<%= dynamic_failed ? 'Failed to dynamically obtain GPU options from Slurm. Showing minimal defaults (none/any).' : "Auto-detected GPUs: #{detected_types.to_a.join(', ')}. Sizes: #{a100_sizes.to_a.join(', ')}." %>"
+    options:
+<% options.each do |label, value| %>
+      - [ "<%= label %>", "<%= value %>" ]
+<% end %>
 
 form:
   - conda_extensions
