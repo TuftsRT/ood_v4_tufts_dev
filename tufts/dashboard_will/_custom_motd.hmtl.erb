@@ -1,0 +1,89 @@
+# https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/config/views/widgets/_custom_motd.html.erb
+
+<div class="custom-widget motd-box">
+  <h3 class="custom-widget-title">
+    <i class="fa fa-bullhorn"></i> Message of the Day
+  </h3>
+  
+  <% motd_path = ENV['MOTD_PATH'] || "/home/hpcadmin/ondemand/dev/dashboard/public/motd" %>
+  <% motd_format = ENV['MOTD_FORMAT'] || "markdown" %>
+  
+  <% if Dir.exist?(motd_path) %>
+    <% files = Dir.glob(File.join(motd_path, "*")).sort %>
+    <% if files.empty? %>
+      <div class="motd-empty">No messages found in <code><%= motd_path %></code></div>
+    <% else %>
+      <div class="motd-content">
+        <% files.each_with_index do |file_path, idx| %>
+          <% next unless File.file?(file_path) %>
+          <div class="motd-message" id="motd-msg-<%= idx %>">
+            <% if file_path.end_with?('.md') %>
+              <% require 'redcarpet' %>
+              <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
+              <%= raw markdown.render(File.read(file_path)) %>
+            <% elsif file_path.end_with?('.yml', '.yaml') %>
+              <% require 'yaml' %>
+              <% data = YAML.safe_load(File.read(file_path)) rescue {} %>
+              <% if data['title'] %><h4><%= data['title'] %></h4><% end %>
+              <% if data['message'] %><%= simple_format(data['message']) %><% end %>
+            <% elsif file_path.end_with?('.txt') %>
+              <%= simple_format(File.read(file_path)) %>
+            <% else %>
+              <pre><%= File.read(file_path) %></pre>
+            <% end %>
+            <button class="motd-mark-read" data-motd-id="<%= idx %>">Mark as Read</button>
+          </div>
+        <% end %>
+        <div class="motd-all-read" id="motd-all-read" style="display: none;">
+          <i class="fa fa-check-circle"></i>
+          <p>All messages have been read!</p>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="motd-empty">
+      <strong>Warning:</strong> MOTD path not found.<br>
+      Checked: <code><%= motd_path %></code>
+    </div>
+  <% end %>
+</div>
+
+<script>
+(function() {
+  // Use event delegation to handle button clicks
+  document.addEventListener('DOMContentLoaded', function() {
+    const motdContent = document.querySelector('.motd-content');
+    
+    if (motdContent) {
+      motdContent.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('motd-mark-read')) {
+          const motdId = e.target.getAttribute('data-motd-id');
+          const msg = document.getElementById('motd-msg-' + motdId);
+          
+          if (msg) {
+            // Add fade-out class
+            msg.classList.add('fade-out');
+            
+            // Wait for animation to complete, then remove element
+            setTimeout(function() {
+              msg.remove();
+              
+              // Check if all messages are gone
+              const remainingMessages = document.querySelectorAll('.motd-message').length;
+              if (remainingMessages === 0) {
+                const allReadMsg = document.getElementById('motd-all-read');
+                if (allReadMsg) {
+                  allReadMsg.style.display = 'flex';
+                  setTimeout(function() {
+                    allReadMsg.classList.add('fade-in');
+                  }, 10);
+                }
+              }
+            }, 400); // Match the CSS transition duration
+          }
+        }
+      });
+    }
+  });
+})();
+</script>
