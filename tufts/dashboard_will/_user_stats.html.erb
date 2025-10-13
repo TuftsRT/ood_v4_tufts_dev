@@ -1,0 +1,97 @@
+# https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/config/views/widgets/_user_stats.html.erb
+
+<div class="user-stats-widget">
+  <div class="widget-header">
+    <h3 class="widget-title">
+      <i class="fa fa-user"></i> User Statistics
+    </h3>
+  </div>
+  
+  <div class="stats-grid">
+    <%# Current User Info %>
+    <div class="stat-card stat-primary">
+      <div class="stat-icon">
+        <i class="fa fa-user-circle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Username</div>
+        <div class="stat-value"><%= User.new.name %></div>
+      </div>
+    </div>
+    
+    <%# Active Jobs Count %>
+    <div class="stat-card stat-success">
+      <div class="stat-icon">
+        <i class="fa fa-tasks"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Active Jobs</div>
+        <div class="stat-value" id="active-jobs-count">
+          <% begin %>
+            <%= OodAppkit.clusters.map { |c| 
+              c.job_adapter.info_all_each(owner: User.new.name).count rescue 0 
+            }.sum %>
+          <% rescue %>
+            0
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <%# Disk Usage %>
+    <% if ENV['OOD_QUOTA_PATH'] %>
+      <div class="stat-card stat-warning">
+        <div class="stat-icon">
+          <i class="fa fa-hdd-o"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Disk Usage</div>
+          <div class="stat-value" id="disk-usage">
+            <%= render partial: 'quota_summary' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    
+    <%# Account Balance %>
+    <% if ENV['OOD_BALANCE_PATH'] %>
+      <div class="stat-card stat-info">
+        <div class="stat-icon">
+          <i class="fa fa-credit-card"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Account Balance</div>
+          <div class="stat-value" id="account-balance">
+            <%= render partial: 'balance_summary' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    
+    <%# Last Login %>
+    <div class="stat-card stat-secondary">
+      <div class="stat-icon">
+        <i class="fa fa-clock-o"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Last Login</div>
+        <div class="stat-value" id="last-login">
+          <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
+        </div>
+      </div>
+    </div>
+    
+    <%# Session Duration %>
+    <div class="stat-card stat-default">
+      <div class="stat-icon">
+        <i class="fa fa-hourglass-half"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Session Duration</div>
+        <div class="stat-value" id="session-duration">Active</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/pun/dev/dashboard/custom_scripts/user_stats.js"></script>
