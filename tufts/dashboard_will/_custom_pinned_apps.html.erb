@@ -1,0 +1,35 @@
+# https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/config/views/widgets/_custom_pinned_apps.html.erb
+
+<div class="widget custom-pinned-apps">
+  <h4>Your Pinned Apps</h4>
+  <p style="font-size: 0.9rem; color: #666;">Select which apps to display on your dashboard.</p>
+
+  <% begin %>
+    <% 
+      # Explicitly gather apps from all available sources (sys, usr, dev)
+      all_apps = []
+      [:sys, :usr, :dev].each do |type|
+        OodAppGroup.groups_for(type).each do |group|
+          all_apps.concat(group.apps)
+        end
+      end
+      all_apps.uniq!
+    %>
+
+    <% if all_apps.empty? %>
+      <div style="color:#777;">No apps found. Make sure you have apps under /var/www/ood/apps/{sys,usr,dev} or ~/ondemand/dev/</div>
+    <% else %>
+      <div class="pinned-apps-container" style="max-height: 220px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+        <% all_apps.each do |app| %>
+          <div class="pinned-app-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span><%= app.title %></span>
+            <button class="btn btn-sm btn-outline-primary">Pin</button>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+  <% rescue => e %>
+    <div style="color:red;">Error loading apps: <%= e.message %></div>
+  <% end %>
+</div>
