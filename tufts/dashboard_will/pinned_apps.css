@@ -1,0 +1,77 @@
+/* https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/dev/dashboard/public/custom_styles/pinned_apps.css */
+
+/* === Pinned Apps Widget === */
+.pinned-apps-widget {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.widget-title {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.app-card {
+  background: white;
+  text-align: center;
+  padding: 15px 10px;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: 1px solid #e0e0e0;
+}
+
+.app-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.app-card a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.placeholder-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #eee;
+  border-radius: 8px;
+}
+
+.app-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  word-wrap: break-word;
+}
+
+.no-pinned-apps {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
