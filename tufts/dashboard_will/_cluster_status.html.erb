@@ -1,0 +1,33 @@
+# https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/config/views/widgets/_cluster_status.html.erb
+
+<div class="cluster-status-widget">
+  <div class="widget-header">
+    <h3 class="widget-title">
+      <i class="fa fa-server"></i> Cluster Status
+    </h3>
+  </div>
+
+  <div class="cluster-grid">
+    <% OodAppkit.clusters.each do |cluster| %>
+      <div class="cluster-card">
+        <div class="cluster-icon">
+          <i class="fa fa-hdd"></i>
+        </div>
+        
+        <div class="cluster-info">
+          <div class="cluster-name"><%= cluster.id.capitalize %></div>
+          
+          <% begin %>
+            <% job_count = cluster.job_adapter.info_all_each(owner: User.new.name).count %>
+            <div class="cluster-status-label">
+              <span class="status-badge status-ok">Active</span>
+              <span class="cluster-jobs"><%= job_count %> jobs</span>
+            </div>
+          <% rescue StandardError => e %>
+            <span class="status-badge status-down">Unavailable</span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
