@@ -1,0 +1,47 @@
+# https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/config/views/widgets/_recent_jobs.html.erb
+
+# NOT TESTED
+
+<div class="recent-jobs-widget">
+  <div class="widget-header">
+    <h3 class="widget-title">
+      <i class="fa fa-history"></i> Recent Jobs
+    </h3>
+  </div>
+  
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>Job ID</th>
+        <th>Cluster</th>
+        <th>Status</th>
+        <th>Submitted</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% OodAppkit.clusters.each do |cluster| %>
+        <% begin %>
+          <% jobs = cluster.job_adapter.info_all_each(owner: User.new.name).take(5) %>
+          <% jobs.each do |job| %>
+            <tr>
+              <td><%= job.id %></td>
+              <td><%= cluster.id.capitalize %></td>
+              <td>
+                <span class="status-badge <%= job.status.to_s.downcase %>">
+                  <%= job.status.to_s.capitalize %>
+                </span>
+              </td>
+              <td><%= job.submit_time&.strftime("%Y-%m-%d %H:%M") || "N/A" %></td>
+            </tr>
+          <% end %>
+        <% rescue StandardError => e %>
+          <tr>
+            <td colspan="4" class="error-row">
+              Cluster <%= cluster.id %> unavailable
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
