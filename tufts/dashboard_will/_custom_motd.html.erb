@@ -1,0 +1,44 @@
+# https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/config/views/widgets/_custom_motd.html.erb
+
+<div class="custom-widget motd-box">
+  <h3 class="custom-widget-title">
+    <i class="fa fa-bullhorn"></i> Message of the Day
+  </h3>
+
+  <% # Fixed MOTD directory %>
+  <% motd_path = "/home/hpcadmin/ondemand/dev/dashboard/public/motd" %>
+  <% motd_format = "markdown" %>
+
+  <% if Dir.exist?(motd_path) %>
+    <% files = Dir.glob(File.join(motd_path, "*")).sort %>
+    <% if files.empty? %>
+      <div class="motd-empty">No messages found in <code><%= motd_path %></code></div>
+    <% else %>
+      <div class="motd-content">
+        <% files.each do |file_path| %>
+          <% next unless File.file?(file_path) %>
+
+          <div class="motd-message">
+            <% if file_path.end_with?('.md') %>
+              <% require 'redcarpet' %>
+              <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML) %>
+              <%= raw markdown.render(File.read(file_path)) %>
+            <% elsif file_path.end_with?('.yml', '.yaml') %>
+              <% require 'yaml' %>
+              <% data = YAML.safe_load(File.read(file_path)) rescue {} %>
+              <% if data['title'] %><h4><%= data['title'] %></h4><% end %>
+              <% if data['message'] %><%= simple_format(data['message']) %><% end %>
+            <% else %>
+              <pre><%= File.read(file_path) %></pre>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="motd-empty">
+      <strong>Warning:</strong> MOTD path not found.<br>
+      Checked: <code><%= motd_path %></code>
+    </div>
+  <% end %>
+</div>
