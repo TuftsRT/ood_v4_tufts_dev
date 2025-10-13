@@ -25,9 +25,9 @@ dashboard_layout:
 
     - columns:
         - width: 4
-          widgets: [ custom_motd ]     # ✅ using your working MOTD widget
+          widgets: [ custom_motd ]
         - width: 8
-          widgets: [ custom_pinned_apps ]  # ✅ your new custom pinned apps widget
+          widgets: [ custom_pinned_apps ]
 
     - columns:
         - width: 6
