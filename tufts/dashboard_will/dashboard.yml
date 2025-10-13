@@ -1,0 +1,36 @@
+#/config/ondemand.d/dashboard.yml
+
+pinned_apps:
+  - 'sys/*'
+
+pinned_apps_menu_length: 4
+pinned_apps_group_by: category
+
+public_url: "/pun/dev/dashboard/"
+
+custom_css_files:
+  - "custom_styles/user_stats.css"
+  - "custom_styles/rest.css"
+  - "custom_styles/cluster_status.css"
+  - "custom_styles/motd.css"
+  - "custom_styles/pinned_apps.css"
+  - "custom_styles/widget_base.css"
+
+dashboard_layout:
+  rows:
+    # Top row:
+    - columns:
+        - width: 12
+          widgets: [ user_stats ]
+
+    - columns:
+        - width: 4
+          widgets: [ custom_motd ]     # ✅ using your working MOTD widget
+        - width: 8
+          widgets: [ custom_pinned_apps ]  # ✅ your new custom pinned apps widget
+
+    - columns:
+        - width: 6
+          widgets: [ cluster_status ]
+        - width: 6
+          widgets: [ recent_jobs ]
