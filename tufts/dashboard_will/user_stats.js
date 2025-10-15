@@ -1,83 +1,103 @@
-// custom_scripts/user_stats.js
+// public/custom_scripts/user_stats.js
 document.addEventListener("DOMContentLoaded", function () {
-  const activeJobsElement = document.getElementById("active-jobs-count");
-  const diskUsageElement = document.getElementById("disk-usage");
-  const accountBalanceElement = document.getElementById("account-balance");
-  const sessionDurationElement = document.getElementById("session-duration");
-  const lastLoginElement = document.getElementById("last-login");
+  const activeJobsEl = document.getElementById("active-jobs-count");
+  const diskUsageEl = document.getElementById("disk-usage");
+  const accountBalanceEl = document.getElementById("account-balance");
+  const sessionDurationEl = document.getElementById("session-duration");
+  const lastLoginEl = document.getElementById("last-login");
 
-  // Store login time to calculate session duration
+  // session start for duration
   const loginTime = new Date();
 
-  /** Utility: Fetch JSON safely */
-  async function fetchJSON(url) {
+  // compute base path from current location and widget script path.
+  // If the dashboard is served at /pun/dev/dashboard/ then basePath -> "/pun/dev/dashboard/"
+  let basePath = window.location.pathname;
+  if (!basePath.endsWith("/")) basePath += "/";
+
+  async function safeFetchJson(path) {
     try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return await response.json();
+      const url = new URL(path, window.location.origin + basePath).toString();
+      const resp = await fetch(url, { cache: "no-cache" });
+      if (!resp.ok) {
+        // return { ok:false, status:resp.status } for caller to decide
+        return { ok: false, status: resp.status };
+      }
+      const data = await resp.json();
+      return { ok: true, data };
     } catch (err) {
-      console.error(`Error fetching ${url}:`, err);
-      return null;
+      console.warn("fetch error:", err, path);
+      return { ok: false, status: "network" };
     }
   }
 
-  /** Update Active Jobs Count (via API endpoint if available) */
+  // Helper to safely set textContent only if element exists
+  function setText(el, text) {
+    if (!el) return;
+    // preserve any inner markup if original content included HTML (rare)
+    el.textContent = text;
+  }
+
   async function updateActiveJobs() {
-    // You can adapt this URL to match your cluster’s API or job listing route.
-    const data = await fetchJSON("/pun/sys/dashboard/api/jobs?owner=me");
-    if (data && activeJobsElement) {
-      activeJobsElement.textContent = data.active_jobs ?? data.length ?? "0";
+    // Try motd file first: public/motd/active_jobs.json
+    const r = await safeFetchJson("motd/active_jobs.json");
+    if (r.ok && r.data) {
+      setText(activeJobsEl, r.data.active_jobs ?? r.data.count ?? r.data.length ?? "0");
+      return;
     }
+
+    // Fallback: don't change existing server-rendered count (keep what's in DOM)
+    console.debug("active_jobs.json not found or failed:", r.status);
   }
 
-  /** Update Disk Usage (via static script or JSON feed) */
   async function updateDiskUsage() {
-    // Example: a small script or endpoint writing to /motd/disk_usage.json
-    const data = await fetchJSON("/pun/dev/dashboard/motd/disk_usage.json");
-    if (data && diskUsageElement) {
-      diskUsageElement.textContent = data.usage || "N/A";
+    const r = await safeFetchJson("motd/disk_usage.json");
+    if (r.ok && r.data) {
+      setText(diskUsageEl, r.data.usage ?? r.data.text ?? "N/A");
+      return;
     }
+    console.debug("disk_usage.json not found or failed:", r.status);
   }
 
-  /** Update Account Balance (if supported) */
   async function updateAccountBalance() {
-    const data = await fetchJSON("/pun/dev/dashboard/motd/account_balance.json");
-    if (data && accountBalanceElement) {
-      accountBalanceElement.textContent = `$${data.balance || "N/A"}`;
+    const r = await safeFetchJson("motd/account_balance.json");
+    if (r.ok && r.data) {
+      // allow numeric or string
+      const value = typeof r.data.balance !== "undefined" ? r.data.balance : r.data.text;
+      setText(accountBalanceEl, (typeof value === "number") ? `$${value}` : (value ?? "N/A"));
+      return;
     }
+    console.debug("account_balance.json not found or failed:", r.status);
   }
 
-  /** Update Session Duration dynamically every second */
+  async function updateLastLogin() {
+    const r = await safeFetchJson("motd/last_login.json");
+    if (r.ok && r.data) {
+      setText(lastLoginEl, r.data.last_login ?? r.data.text ?? lastLoginEl.textContent);
+      return;
+    }
+    console.debug("last_login.json not found or failed:", r.status);
+  }
+
   function updateSessionDuration() {
     const now = new Date();
-    const diffMs = now - loginTime;
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    if (sessionDurationElement) {
-      sessionDurationElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
-    }
+    const diff = Math.floor((now - loginTime) / 1000);
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = diff % 60;
+    setText(sessionDurationEl, `${h}h ${m}m ${s}s`);
   }
 
-  /** Optionally update the last login dynamically from a file */
-  async function updateLastLogin() {
-    const data = await fetchJSON("/pun/dev/dashboard/motd/last_login.json");
-    if (data && lastLoginElement) {
-      lastLoginElement.textContent = data.last_login || lastLoginElement.textContent;
-    }
-  }
-
-  // ---- Initialization ----
+  // initial run (these functions fall back if files aren't present)
   updateActiveJobs();
   updateDiskUsage();
   updateAccountBalance();
   updateLastLogin();
   updateSessionDuration();
 
-  // ---- Refresh intervals ----
-  setInterval(updateActiveJobs, 60 * 1000); // every minute
-  setInterval(updateDiskUsage, 5 * 60 * 1000); // every 5 minutes
-  setInterval(updateAccountBalance, 10 * 60 * 1000); // every 10 minutes
-  setInterval(updateSessionDuration, 1000); // every second
+  // intervals
+  setInterval(updateActiveJobs, 60 * 1000);       // 1m
+  setInterval(updateDiskUsage, 5 * 60 * 1000);    // 5m
+  setInterval(updateAccountBalance, 10 * 60 * 1000); // 10m
+  setInterval(updateLastLogin, 5 * 60 * 1000);    // 5m
+  setInterval(updateSessionDuration, 1000);       // every second
 });
