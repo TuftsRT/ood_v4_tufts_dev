@@ -3,8 +3,8 @@
     <i class="fa fa-bullhorn"></i> Message of the Day
   </h3>
 
-  <% motd_path = "/home/hpcadmin/ondemand/dev/dashboard/public/motd" %>
-  <% motd_format = "markdown" %>
+  <% motd_path = ENV['MOTD_PATH'] || "/home/hpcadmin/ondemand/dev/dashboard/public/motd" %>
+  <% motd_format = ENV['MOTD_FORMAT'] || "markdown" %>
 
   <% if Dir.exist?(motd_path) %>
     <% files = Dir.glob(File.join(motd_path, "*")).sort %>
@@ -42,4 +42,4 @@
   <% end %>
 </div>
 
-<script src="/public/custom_scripts/motd.js"></script>
+<script src="/pun/dev/dashboard/custom_scripts/motd.js"></script>
