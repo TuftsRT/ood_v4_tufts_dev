@@ -1,11 +1,8 @@
-# https://localhost:3443/pun/sys/dashboard/files/edit/fs/home/hpcadmin/ondemand/config/views/widgets/_custom_motd.html.erb
-
 <div class="custom-widget motd-box">
   <h3 class="custom-widget-title">
     <i class="fa fa-bullhorn"></i> Message of the Day
   </h3>
 
-  <% # Fixed MOTD directory %>
   <% motd_path = "/home/hpcadmin/ondemand/dev/dashboard/public/motd" %>
   <% motd_format = "markdown" %>
 
@@ -17,7 +14,6 @@
       <div class="motd-content">
         <% files.each do |file_path| %>
           <% next unless File.file?(file_path) %>
-
           <div class="motd-message">
             <% if file_path.end_with?('.md') %>
               <% require 'redcarpet' %>
@@ -31,6 +27,9 @@
             <% else %>
               <pre><%= File.read(file_path) %></pre>
             <% end %>
+
+            <!-- Mark as read button -->
+            <button class="motd-mark-read">Mark as Read</button>
           </div>
         <% end %>
       </div>
@@ -42,3 +41,5 @@
     </div>
   <% end %>
 </div>
+
+<script src="/public/custom_scripts/motd.js"></script>
