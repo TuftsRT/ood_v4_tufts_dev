@@ -1,103 +1,91 @@
 // public/custom_scripts/user_stats.js
 document.addEventListener("DOMContentLoaded", function () {
-  const activeJobsEl = document.getElementById("active-jobs-count");
-  const diskUsageEl = document.getElementById("disk-usage");
-  const accountBalanceEl = document.getElementById("account-balance");
   const sessionDurationEl = document.getElementById("session-duration");
-  const lastLoginEl = document.getElementById("last-login");
-
-  // session start for duration
   const loginTime = new Date();
 
-  // compute base path from current location and widget script path.
-  // If the dashboard is served at /pun/dev/dashboard/ then basePath -> "/pun/dev/dashboard/"
-  let basePath = window.location.pathname;
-  if (!basePath.endsWith("/")) basePath += "/";
-
-  async function safeFetchJson(path) {
-    try {
-      const url = new URL(path, window.location.origin + basePath).toString();
-      const resp = await fetch(url, { cache: "no-cache" });
-      if (!resp.ok) {
-        // return { ok:false, status:resp.status } for caller to decide
-        return { ok: false, status: resp.status };
-      }
-      const data = await resp.json();
-      return { ok: true, data };
-    } catch (err) {
-      console.warn("fetch error:", err, path);
-      return { ok: false, status: "network" };
-    }
-  }
-
-  // Helper to safely set textContent only if element exists
-  function setText(el, text) {
-    if (!el) return;
-    // preserve any inner markup if original content included HTML (rare)
-    el.textContent = text;
-  }
-
-  async function updateActiveJobs() {
-    // Try motd file first: public/motd/active_jobs.json
-    const r = await safeFetchJson("motd/active_jobs.json");
-    if (r.ok && r.data) {
-      setText(activeJobsEl, r.data.active_jobs ?? r.data.count ?? r.data.length ?? "0");
-      return;
-    }
-
-    // Fallback: don't change existing server-rendered count (keep what's in DOM)
-    console.debug("active_jobs.json not found or failed:", r.status);
-  }
-
-  async function updateDiskUsage() {
-    const r = await safeFetchJson("motd/disk_usage.json");
-    if (r.ok && r.data) {
-      setText(diskUsageEl, r.data.usage ?? r.data.text ?? "N/A");
-      return;
-    }
-    console.debug("disk_usage.json not found or failed:", r.status);
-  }
-
-  async function updateAccountBalance() {
-    const r = await safeFetchJson("motd/account_balance.json");
-    if (r.ok && r.data) {
-      // allow numeric or string
-      const value = typeof r.data.balance !== "undefined" ? r.data.balance : r.data.text;
-      setText(accountBalanceEl, (typeof value === "number") ? `$${value}` : (value ?? "N/A"));
-      return;
-    }
-    console.debug("account_balance.json not found or failed:", r.status);
-  }
-
-  async function updateLastLogin() {
-    const r = await safeFetchJson("motd/last_login.json");
-    if (r.ok && r.data) {
-      setText(lastLoginEl, r.data.last_login ?? r.data.text ?? lastLoginEl.textContent);
-      return;
-    }
-    console.debug("last_login.json not found or failed:", r.status);
-  }
-
+  // === Session Duration (always active) ===
   function updateSessionDuration() {
     const now = new Date();
     const diff = Math.floor((now - loginTime) / 1000);
     const h = Math.floor(diff / 3600);
     const m = Math.floor((diff % 3600) / 60);
     const s = diff % 60;
-    setText(sessionDurationEl, `${h}h ${m}m ${s}s`);
+    if (sessionDurationEl) {
+      sessionDurationEl.textContent = `${h}h ${m}m ${s}s`;
+    }
   }
 
-  // initial run (these functions fall back if files aren't present)
-  updateActiveJobs();
-  updateDiskUsage();
-  updateAccountBalance();
-  updateLastLogin();
   updateSessionDuration();
+  setInterval(updateSessionDuration, 1000);
 
-  // intervals
-  setInterval(updateActiveJobs, 60 * 1000);       // 1m
-  setInterval(updateDiskUsage, 5 * 60 * 1000);    // 5m
-  setInterval(updateAccountBalance, 10 * 60 * 1000); // 10m
-  setInterval(updateLastLogin, 5 * 60 * 1000);    // 5m
-  setInterval(updateSessionDuration, 1000);       // every second
+  // === Optional dynamic sections (disabled in dev) ===
+  // Uncomment these blocks later when you have corresponding data files or APIs.
+
+  /*
+  async function updateActiveJobs() {
+    const el = document.getElementById("active-jobs-count");
+    if (!el) return;
+    try {
+      const resp = await fetch("/pun/dev/dashboard/motd/active_jobs.json", { cache: "no-cache" });
+      if (resp.ok) {
+        const data = await resp.json();
+        el.textContent = data.active_jobs ?? "0";
+      }
+    } catch (err) {
+      console.debug("Active jobs fetch skipped:", err);
+    }
+  }
+
+  async function updateDiskUsage() {
+    const el = document.getElementById("disk-usage");
+    if (!el) return;
+    try {
+      const resp = await fetch("/pun/dev/dashboard/motd/disk_usage.json", { cache: "no-cache" });
+      if (resp.ok) {
+        const data = await resp.json();
+        el.textContent = data.usage ?? "N/A";
+      }
+    } catch (err) {
+      console.debug("Disk usage fetch skipped:", err);
+    }
+  }
+
+  async function updateAccountBalance() {
+    const el = document.getElementById("account-balance");
+    if (!el) return;
+    try {
+      const resp = await fetch("/pun/dev/dashboard/motd/account_balance.json", { cache: "no-cache" });
+      if (resp.ok) {
+        const data = await resp.json();
+        el.textContent = `$${data.balance ?? "N/A"}`;
+      }
+    } catch (err) {
+      console.debug("Account balance fetch skipped:", err);
+    }
+  }
+
+  async function updateLastLogin() {
+    const el = document.getElementById("last-login");
+    if (!el) return;
+    try {
+      const resp = await fetch("/pun/dev/dashboard/motd/last_login.json", { cache: "no-cache" });
+      if (resp.ok) {
+        const data = await resp.json();
+        el.textContent = data.last_login ?? el.textContent;
+      }
+    } catch (err) {
+      console.debug("Last login fetch skipped:", err);
+    }
+  }
+
+  // Run periodically (enable once data endpoints exist)
+  // updateActiveJobs();
+  // updateDiskUsage();
+  // updateAccountBalance();
+  // updateLastLogin();
+  // setInterval(updateActiveJobs, 60000);
+  // setInterval(updateDiskUsage, 300000);
+  // setInterval(updateAccountBalance, 600000);
+  // setInterval(updateLastLogin, 300000);
+  */
 });
