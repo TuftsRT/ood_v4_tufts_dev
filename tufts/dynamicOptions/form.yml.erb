@@ -7,6 +7,23 @@ bc_dynamic_js: true
 <%= ERB.new(File.read(File.expand_path('partials/gpu_discovery.erb', __dir__))).result(binding) %>
 
 attributes:
+  notice:
+    widget: "text_field"
+    label: ""
+    value: ""
+    help: |
+      <div class="alert alert-warning" role="alert">
+        <strong>Important: Upcoming resource limits</strong><br/>
+        From 10/02/2025, the following resource limit (maximum simultaneous resource allocation) will be applied to all early adopters:
+        <ul style="margin: 0.5rem 0 0 1.25rem;">
+          <li>CPU: 32</li>
+          <li>CPU Memory: 256GB</li>
+          <li>GPU: 2</li>
+          <li>Maximum Job Timelimit: 48 hours</li>
+        </ul>
+      </div>
+    html_options:
+      style: "display:none"
   conda_extensions: "0"
 
   extra_jupyter_args: ""
@@ -24,10 +41,12 @@ begin
     f.puts "options=#{@options.inspect}"
     f.puts "partitions_seen=#{@all_partitions.inspect}"
     f.puts "partition_options_map_keys=#{@partition_options_map.keys.inspect}"
-    f.puts "max_cores_by_partition=#{@max_cores_by_partition.inspect}"
+    f.puts "max_cores_by_partition_and_gpu=#{@max_cores_by_partition_and_gpu.inspect}"
     f.puts "global_max_cores=#{@global_max_cores}"
-    f.puts "max_memory_by_partition=#{@max_memory_by_partition.inspect}"
+    f.puts "max_memory_by_partition_and_gpu=#{@max_memory_by_partition_and_gpu.inspect}"
     f.puts "global_max_memory=#{@global_max_memory}"
+    f.puts "max_hours_by_partition=#{@max_hours_by_partition.inspect}"
+    f.puts "global_max_hours=#{@global_max_hours}"
   end
 rescue => e
   # swallow logging errors so the form still renders
@@ -38,6 +57,7 @@ end
 <%= generate_num_cores_field.indent(2) %>
 <%= generate_num_memory_field.indent(2) %>
 <%= generate_gpu_type_field.indent(2) %>
+<%= generate_num_hours_field.indent(2) %>
     
   working_directory:
     widget: "text_field"
@@ -59,14 +79,15 @@ end
 
 
 form:
+  - notice
   - conda_extensions
   - extra_jupyter_args
   - mode
-  - bc_num_hours
   - partition
+  - bc_num_hours
+  - gpu_type
   - num_cores
   - num_memory
-  - gpu_type
   - working_directory
   - module
 
