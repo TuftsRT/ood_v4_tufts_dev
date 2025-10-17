@@ -12,23 +12,23 @@
       <div class="motd-empty">No messages found in <code><%= motd_path %></code></div>
     <% else %>
       <div class="motd-content">
-        <% files.each do |file_path| %>
+        <% files.each_with_index do |file_path, index| %>
           <% next unless File.file?(file_path) %>
-          <div class="motd-message">
-            <% if file_path.end_with?('.md') %>
+
+          <div class="motd-message" data-message-number="<%= index + 1 %>">
+            <% if motd_format == "markdown" && file_path.end_with?('.md') %>
               <% require 'redcarpet' %>
               <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML) %>
               <%= raw markdown.render(File.read(file_path)) %>
+            <% elsif motd_format.start_with?("txt") %>
+              <pre><%= File.read(file_path) %></pre>
             <% elsif file_path.end_with?('.yml', '.yaml') %>
               <% require 'yaml' %>
               <% data = YAML.safe_load(File.read(file_path)) rescue {} %>
               <% if data['title'] %><h4><%= data['title'] %></h4><% end %>
               <% if data['message'] %><%= simple_format(data['message']) %><% end %>
-            <% else %>
-              <pre><%= File.read(file_path) %></pre>
             <% end %>
 
-            <!-- Mark as read button -->
             <button class="motd-mark-read">Mark as Read</button>
           </div>
         <% end %>
