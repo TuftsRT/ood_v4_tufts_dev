@@ -26,6 +26,155 @@ attributes:
     options:
       - ["Jupyter Lab", "1"]
       - ["Jupyter Notebook", "0"]
+    help: |
+      <script>
+        const labelLab = document.querySelector('label[for="batch_connect_session_context_mode_1"]');
+        const labelNotebook = document.querySelector('label[for="batch_connect_session_context_mode_0"]');
+
+        if (labelLab && labelNotebook) {
+          const labText = labelLab.innerHTML;
+          const notebookText = labelNotebook.innerHTML;
+          
+          labelLab.setAttribute('data-label', labText.trim());
+          labelNotebook.setAttribute('data-label', notebookText.trim());
+          
+          labelNotebook.innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Jupyter_logo.svg/1767px-Jupyter_logo.svg.png" alt="jupyter" class="img_icon"><span>${labText}</span>`;
+          labelLab.innerHTML = `<img src="https://user-images.githubusercontent.com/7244206/224844987-30e9b7c5-abb1-416d-9e3d-63dc8ce9d532.png" alt="jupyter_lab" class="img_icon"><span>${notebookText}</span>`;
+        }
+      </script>
+      
+      <style>
+        /* Main wrapper */
+        .jupyter-mode-wrapper {
+            display: block;
+            padding-top: 8px;
+        }
+        
+        /* Ensure question label is full width, above icons */
+        .jupyter-mode-wrapper > .form-label,
+        .jupyter-mode-wrapper > label.form-label {
+          display: block;
+          width: 100%;
+          margin-bottom: 12px;
+          text-align: left;
+          font-weight: 600;
+        }
+        
+        /* Row for icons side by side, left aligned */
+        .jupyter-mode-options-row {
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          gap: 32px;
+          align-items: flex-start;
+        }
+        
+        /* Each option: icon above radio */
+        .jupyter-mode-option {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          margin: 0;
+          position: relative;
+          background: white;
+          border: 3px solid #e5e7eb;
+          border-radius: 12px;
+          justify-content: center;
+          cursor: pointer;
+          width: 110px;
+          height: 110px;
+          padding-bottom: 8px;
+        }
+        
+        /* Put label (with img) visually above input */
+        .jupyter-mode-option .form-check-label {
+          order: -1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          cursor: pointer;
+          justify-content: center;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+        }
+        
+        /* Icon styling */
+        .jupyter-mode-option .img_icon {
+          width: 50px;
+          height: 50px;
+          object-fit: contain;
+          display: block;
+          border-radius: 8px;
+          cursor: pointer;
+          margin-bottom: 0px;
+        }
+        
+        /* Hide the original text inside the label */
+        .jupyter-mode-option .form-check-label span {
+          display: none;
+        }
+        
+        /* Add text labels below images using the data-label attribute */
+        .jupyter-mode-option .form-check-label::after {
+          content: attr(data-label);
+          font-size: 13px;
+          font-weight: 500;
+          color: #374151;
+          text-align: center;
+          margin-top: 4px;
+          display: block;
+          width: 100%;
+        }
+        
+        /* Adjust flex-direction to stack icon and text */
+        .jupyter-mode-option .form-check-label {
+          flex-direction: column;
+          gap: 4px;
+        }
+        
+        /* Radio input below each icon (if visible) */
+        .jupyter-mode-option input[type="radio"] {
+          margin-top: 4px;
+          transform: scale(1.2);
+          cursor: pointer;
+              z-index: 10; /* Ensure it's clickable over the label */
+        }
+        
+        /* Hover effects */
+        .jupyter-mode-option:hover {
+          border-color: #3babf6;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Selected state */
+        .jupyter-mode-option.selected {
+          border-color: skyblue;
+          background: #3babf6;
+          color: white;
+        }
+        
+        .jupyter-mode-option.selected .img_icon {
+          filter: brightness(1.1);
+        }
+        
+        .jupyter-mode-option.selected .form-check-label::after {
+          color: white;
+        }
+        
+        /* Hide radios but keep accessible */
+        .jupyter-mode-wrapper.hide-radios .jupyter-mode-option input[type="radio"] {
+          position: absolute !important;
+          left: -9999px !important;
+          width: 1px !important;
+          height: 1px !important;
+          overflow: hidden !important;
+          clip: rect(1px, 1px, 1px, 1px) !important;
+        }
+        </style>
 
   module:
     widget: text_field
@@ -44,4 +193,3 @@ form:
   - gpu_type
   - working_directory
   - module
-
