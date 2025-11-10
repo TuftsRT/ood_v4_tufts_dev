@@ -1,5 +1,3 @@
----
-
 ## Appendix
 
 ### A. Complete File Checklist
