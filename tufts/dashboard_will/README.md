@@ -1,82 +1,3 @@
-### Content Security Policy
-
-All inline scripts use nonce:
-
-```erb
-<script nonce="<%= content_security_policy_nonce %>">
-  // JavaScript code
-</script>
-```
-
-### XSS Protection
-
-Markdown content is rendered safely:
-
-```ruby
-# Uses markdown renderer with sanitization
-raw markdown(message[:content])
-```
-
----
-
-## Maintenance
-
-### Updating MOTD Messages
-
-1. **Edit YAML file:**
-```bash
-vim config/custom_motd.yml
-```
-
-2. **Add new message:**
-```yaml
-- id: new-message-001
-  title: New Announcement
-  date: 2024-11-15
-  priority: info
-  content: |
-    Your message content here.
-```
-
-3. **No restart needed** - messages reload on next page view (or implement cache clearing)
-
-### Clearing User Preferences
-
-**Clear localStorage (client-side):**
-```javascript
-// In browser console
-localStorage.removeItem('user_pinned_apps');
-localStorage.removeItem('motd_read_messages');
-```
-
-**Clear session (server-side):**
-```ruby
-# In Rails console
-session = Session.find_by(session_id: 'session_id_here')
-session.data.delete('pinned_app_ids')
-session.save
-```
-
-### Monitoring
-
-Add monitoring to concerns:
-
-```ruby
-def set_user_stats
-  start_time = Time.now
-  
-  @user_stats = {
-    # ... existing code ...
-  }
-  
-  elapsed = Time.now - start_time
-  Rails.logger.info "User stats loaded in #{elapsed.round(3)}s"
-rescue StandardError => e
-  Rails.logger.error "Error fetching user stats: #{e.message}"
-  # ... error handling ...
-end
-```
-
 ---
 
 ## Appendix
@@ -341,6 +262,8 @@ This installation guide provides comprehensive instructions for implementing thr
 - [ ] Document any custom configurations
 
 Good luck with your installation!
+
+```
 // Edit button for pinned apps widget
 .edit-pinned-apps-btn {
   margin-top: 15px;
