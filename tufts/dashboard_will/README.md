@@ -85,7 +85,7 @@ echo "Creating backup..."
 mkdir -p "$BACKUP_DIR"
 cp -r "$DASHBOARD_ROOT/app" "$BACKUP_DIR/" 2>/dev/null || true
 cp -r "$DASHBOARD_ROOT/config" "$BACKUP_DIR/" 2>/dev/null || true
-echo "✓ Backup created at $BACKUP_DIR"
+echo "Backup created at $BACKUP_DIR"
 echo ""
 
 # Create directories
@@ -93,7 +93,7 @@ echo "Creating directories..."
 mkdir -p "$DASHBOARD_ROOT/app/controllers/concerns"
 mkdir -p "$DASHBOARD_ROOT/app/views/widgets/pinned_apps"
 mkdir -p "$DASHBOARD_ROOT/app/assets/stylesheets"
-echo "✓ Directories created"
+echo "Directories created"
 echo ""
 
 # Check for required files
@@ -118,7 +118,7 @@ for file in "${REQUIRED_FILES[@]}"; do
     exit 1
   fi
 done
-echo "✓ All required files found"
+echo "All required files found"
 echo ""
 
 # Copy files
@@ -128,28 +128,28 @@ echo "Copying files..."
 cp user_stats_concern.rb "$DASHBOARD_ROOT/app/controllers/concerns/"
 cp custom_motd_concern.rb "$DASHBOARD_ROOT/app/controllers/concerns/"
 cp pinned_apps_selector_concern.rb "$DASHBOARD_ROOT/app/controllers/concerns/"
-echo "✓ Concerns copied"
+echo "Concerns copied"
 
 # Controllers
 cp pinned_apps_controller.rb "$DASHBOARD_ROOT/app/controllers/"
-echo "✓ Controllers copied"
+echo "Controllers copied"
 
 # Views
 cp _user_stats.html.erb "$DASHBOARD_ROOT/app/views/widgets/"
 cp _custom_motd.html.erb "$DASHBOARD_ROOT/app/views/widgets/"
 cp _pinned_apps_selector_modal.html.erb "$DASHBOARD_ROOT/app/views/widgets/"
-echo "✓ Views copied"
+echo "Views copied"
 
 # Stylesheets
 cp user_stats.scss "$DASHBOARD_ROOT/app/assets/stylesheets/"
 cp custom_motd.scss "$DASHBOARD_ROOT/app/assets/stylesheets/"
 cp pinned_apps_selector.scss "$DASHBOARD_ROOT/app/assets/stylesheets/"
-echo "✓ Stylesheets copied"
+echo "Stylesheets copied"
 
 # Optional: Copy example MOTD
 if [ -f "custom_motd.yml" ]; then
   cp custom_motd.yml "$DASHBOARD_ROOT/config/"
-  echo "✓ Example MOTD config copied"
+  echo "Example MOTD config copied"
 fi
 
 echo ""
