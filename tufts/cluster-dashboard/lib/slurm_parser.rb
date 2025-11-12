@@ -93,15 +93,26 @@ module SlurmParser
   end
 
   # Parse squeue output for job information
-  # By default, show only running jobs for the current user.
-  # To change behavior later, add parameters (e.g., user_only:, states:).
+  # Shows all jobs (running and pending) for the current user.
+  # The UI has filters to show only running or pending jobs.
   def self.parse_queue
-    output = run_command('squeue --me -t R -o "%i %j %u %t %M %D %C %P %R"')
+    output = run_command('squeue --me -o "%i %j %u %t %M %D %C %b %P %N"')
     jobs = []
     
     output.each_line.drop(1).each do |line| # Skip header
-      parts = line.strip.split(/\s+/, 9)
-      next if parts.length < 8
+      parts = line.strip.split(/\s+/, 10)
+      next if parts.length < 9
+      
+      # Parse GPU allocation from TRES format (e.g., "gres/gpu:a100:1" or "gres/gpu:2" or "N/A")
+      gpu_tres = parts[7] || ''
+      gpus = 0
+      if gpu_tres =~ /gpu:(\w+):(\d+)/
+        # Format: gres/gpu:TYPE:COUNT (e.g., gres/gpu:a100:1)
+        gpus = $2.to_i
+      elsif gpu_tres =~ /gpu:(\d+)/
+        # Format: gres/gpu:COUNT (e.g., gres/gpu:2)
+        gpus = $1.to_i
+      end
       
       job = {
         job_id: parts[0],
@@ -111,8 +122,9 @@ module SlurmParser
         time: parts[4],
         nodes: parts[5].to_i,
         cpus: parts[6].to_i,
-        partition: parts[7],
-        reason: parts[8] || ''
+        gpus: gpus,
+        partition: parts[8],
+        node_list: parts[9] || ''
       }
       
       jobs << job

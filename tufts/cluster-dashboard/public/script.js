@@ -311,7 +311,7 @@ class ClusterDashboard {
         const tbody = document.getElementById('jobs-table-body');
         
         if (jobs.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-clock"></i><p>No jobs in queue</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fas fa-clock"></i><p>No jobs in queue</p></td></tr>';
             return;
         }
 
@@ -319,7 +319,7 @@ class ClusterDashboard {
         let filteredJobs = this.filterJobs(jobs);
 
         if (filteredJobs.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-search"></i><p>No jobs match the current filters</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fas fa-search"></i><p>No jobs match the current filters</p></td></tr>';
             return;
         }
 
@@ -332,8 +332,9 @@ class ClusterDashboard {
                 <td>${job.time}</td>
                 <td>${job.nodes}</td>
                 <td>${job.cpus}</td>
+                <td>${job.gpus || 0}</td>
                 <td>${job.partition}</td>
-                <td>${this.truncate(job.reason, 30)}</td>
+                <td>${this.truncate(job.node_list, 30)}</td>
             </tr>
         `).join('');
 
@@ -342,7 +343,7 @@ class ClusterDashboard {
             const pending = jobs.filter(j => j.state === 'PD').length;
             console.log('[ClusterDashboard] Jobs summary | total=', jobs.length, '| running=', running, '| pending=', pending, '| filtered=', filteredJobs.length);
             const sample = filteredJobs.slice(0, 10).map(j =>
-                `JOB ${j.job_id} | name=${j.name} | user=${j.user} | state=${j.state} | time=${j.time} | nodes=${j.nodes} | cpus=${j.cpus} | part=${j.partition} | reason=${j.reason}`
+                `JOB ${j.job_id} | name=${j.name} | user=${j.user} | state=${j.state} | time=${j.time} | nodes=${j.nodes} | cpus=${j.cpus} | gpus=${j.gpus || 0} | part=${j.partition} | node=${j.node_list}`
             );
             sample.forEach(line => console.log('[ClusterDashboard]', line));
         }
@@ -397,12 +398,12 @@ class ClusterDashboard {
                 const name = String(job.name || '').toLowerCase();
                 const user = String(job.user || '').toLowerCase();
                 const part = String(job.partition || '').toLowerCase();
-                const reason = String(job.reason || '').toLowerCase();
+                const node = String(job.node_list || '').toLowerCase();
                 return jid.includes(searchLower) ||
                        name.includes(searchLower) ||
                        user.includes(searchLower) ||
                        part.includes(searchLower) ||
-                       reason.includes(searchLower);
+                       node.includes(searchLower);
             });
         }
 
