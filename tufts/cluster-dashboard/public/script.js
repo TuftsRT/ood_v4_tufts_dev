@@ -5,6 +5,7 @@ class ClusterDashboard {
         this.autoRefreshInterval = null;
         this.refreshIntervalMs = 30000; // 30 seconds
         this.currentSort = { field: null, ascending: true };
+        this.currentJobSort = { field: null, ascending: true };
         this.currentFilter = 'all';
         this.currentSearch = '';
         this.allNodes = [];
@@ -33,9 +34,14 @@ class ClusterDashboard {
         document.getElementById('job-search').addEventListener('input', (e) => this.handleJobSearch(e.target.value));
         document.getElementById('job-filter').addEventListener('change', (e) => this.handleJobFilter(e.target.value));
         
-        // Set up table sorting
+        // Set up table sorting for nodes
         document.querySelectorAll('thead th[data-sort]').forEach(th => {
             th.addEventListener('click', () => this.handleSort(th.dataset.sort));
+        });
+
+        // Set up table sorting for jobs
+        document.querySelectorAll('thead th[data-sort-job]').forEach(th => {
+            th.addEventListener('click', () => this.handleJobSort(th.dataset.sortJob));
         });
 
         // Initial data load
@@ -325,6 +331,27 @@ class ClusterDashboard {
             return;
         }
 
+        // Apply sorting
+        if (this.currentJobSort.field) {
+            filteredJobs.sort((a, b) => {
+                let aVal = a[this.currentJobSort.field];
+                let bVal = b[this.currentJobSort.field];
+                
+                // Handle null/undefined
+                if (aVal == null) aVal = '';
+                if (bVal == null) bVal = '';
+                
+                // Compare
+                if (typeof aVal === 'string') {
+                    return this.currentJobSort.ascending ? 
+                        aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                } else {
+                    return this.currentJobSort.ascending ? 
+                        aVal - bVal : bVal - aVal;
+                }
+            });
+        }
+
         tbody.innerHTML = filteredJobs.map(job => `
             <tr>
                 <td><strong>${job.job_id}</strong></td>
@@ -381,6 +408,17 @@ class ClusterDashboard {
     handleJobSearch(search) {
         this.currentJobSearch = search;
         this.debug('Job search changed:', search);
+        this.updateJobQueue(this.allJobs);
+    }
+
+    handleJobSort(field) {
+        if (this.currentJobSort.field === field) {
+            this.currentJobSort.ascending = !this.currentJobSort.ascending;
+        } else {
+            this.currentJobSort.field = field;
+            this.currentJobSort.ascending = true;
+        }
+        
         this.updateJobQueue(this.allJobs);
     }
 
