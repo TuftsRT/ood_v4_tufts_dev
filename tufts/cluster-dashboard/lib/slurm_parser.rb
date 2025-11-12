@@ -93,8 +93,10 @@ module SlurmParser
   end
 
   # Parse squeue output for job information
+  # By default, show only running jobs for the current user.
+  # To change behavior later, add parameters (e.g., user_only:, states:).
   def self.parse_queue
-    output = run_command('squeue -o "%i %j %u %t %M %D %C %P %R"')
+    output = run_command('squeue --me -t R -o "%i %j %u %t %M %D %C %P %R"')
     jobs = []
     
     output.each_line.drop(1).each do |line| # Skip header
@@ -169,7 +171,35 @@ module SlurmParser
       }
     end
     
-    summary
+    # Sort partitions: public partitions first in specific order, then lab partitions alphabetically
+    sort_partitions(summary)
+  end
+
+  # Sort partitions with public partitions first, then lab partitions
+  def self.sort_partitions(summary)
+    # Define the order for public partitions
+    public_order = ['batch', 'gpu', 'mpi', 'interactive', 'largemem', 'preempt']
+    
+    # Separate public and lab partitions
+    public_partitions = []
+    lab_partitions = []
+    
+    summary.each do |name, data|
+      if public_order.include?(name)
+        public_partitions << [name, data]
+      else
+        lab_partitions << [name, data]
+      end
+    end
+    
+    # Sort public partitions by the defined order
+    public_partitions.sort_by! { |name, _| public_order.index(name) || 999 }
+    
+    # Sort lab partitions alphabetically
+    lab_partitions.sort_by! { |name, _| name }
+    
+    # Combine and return as a hash
+    (public_partitions + lab_partitions).to_h
   end
 
   # Get complete dashboard data

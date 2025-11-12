@@ -8,6 +8,9 @@ class ClusterDashboard {
         this.currentFilter = 'all';
         this.currentSearch = '';
         this.allNodes = [];
+        this.allJobs = [];
+        this.currentJobFilter = 'all';
+        this.currentJobSearch = '';
         // Debug mode: enable by visiting the page with ?debug=1
         const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
         this.debugEnabled = (params && params.get('debug') === '1') || (typeof window !== 'undefined' && window.DASHBOARD_DEBUG === true);
@@ -27,6 +30,8 @@ class ClusterDashboard {
         document.getElementById('auto-refresh-toggle').addEventListener('change', (e) => this.toggleAutoRefresh(e.target.checked));
         document.getElementById('node-search').addEventListener('input', (e) => this.handleSearch(e.target.value));
         document.getElementById('node-filter').addEventListener('change', (e) => this.handleFilter(e.target.value));
+        document.getElementById('job-search').addEventListener('input', (e) => this.handleJobSearch(e.target.value));
+        document.getElementById('job-filter').addEventListener('change', (e) => this.handleJobFilter(e.target.value));
         
         // Set up table sorting
         document.querySelectorAll('thead th[data-sort]').forEach(th => {
@@ -63,6 +68,7 @@ class ClusterDashboard {
             if (!result.success) {
                 throw new Error(result.error || 'Failed to load data');
             }
+            this.debug('testing testing 123');
 
             this.debug('Fetched dashboard data at', new Date().toISOString(), {
                 stats: result.data?.stats,
@@ -301,6 +307,7 @@ class ClusterDashboard {
 
     updateJobQueue(jobs) {
         this.debug('Rendering jobs table, jobs:', jobs.length);
+        this.allJobs = jobs;
         const tbody = document.getElementById('jobs-table-body');
         
         if (jobs.length === 0) {
@@ -308,10 +315,15 @@ class ClusterDashboard {
             return;
         }
 
-        // Render all jobs; the container is scrollable in CSS.
-        const displayJobs = jobs;
+        // Apply filtering
+        let filteredJobs = this.filterJobs(jobs);
 
-        tbody.innerHTML = displayJobs.map(job => `
+        if (filteredJobs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-search"></i><p>No jobs match the current filters</p></td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filteredJobs.map(job => `
             <tr>
                 <td><strong>${job.job_id}</strong></td>
                 <td>${this.truncate(job.name, 20)}</td>
@@ -328,8 +340,8 @@ class ClusterDashboard {
         if (this.debugEnabled && typeof console !== 'undefined') {
             const running = jobs.filter(j => j.state === 'R').length;
             const pending = jobs.filter(j => j.state === 'PD').length;
-            console.log('[ClusterDashboard] Jobs summary | total=', jobs.length, '| running=', running, '| pending=', pending);
-            const sample = jobs.slice(0, 10).map(j =>
+            console.log('[ClusterDashboard] Jobs summary | total=', jobs.length, '| running=', running, '| pending=', pending, '| filtered=', filteredJobs.length);
+            const sample = filteredJobs.slice(0, 10).map(j =>
                 `JOB ${j.job_id} | name=${j.name} | user=${j.user} | state=${j.state} | time=${j.time} | nodes=${j.nodes} | cpus=${j.cpus} | part=${j.partition} | reason=${j.reason}`
             );
             sample.forEach(line => console.log('[ClusterDashboard]', line));
@@ -355,6 +367,46 @@ class ClusterDashboard {
     handleSearch(search) {
         this.currentSearch = search;
         this.updateNodesTable(this.allNodes);
+    }
+
+    handleJobFilter(filter) {
+        this.currentJobFilter = filter;
+        this.debug('Job filter changed:', filter);
+        this.updateJobQueue(this.allJobs);
+    }
+
+    handleJobSearch(search) {
+        this.currentJobSearch = search;
+        this.debug('Job search changed:', search);
+        this.updateJobQueue(this.allJobs);
+    }
+
+    filterJobs(jobs) {
+        let filtered = jobs;
+
+        // Apply state filter
+        if (this.currentJobFilter !== 'all') {
+            filtered = filtered.filter(job => job.state === this.currentJobFilter);
+        }
+
+        // Apply search filter
+        if (this.currentJobSearch) {
+            const searchLower = String(this.currentJobSearch || '').toLowerCase();
+            filtered = filtered.filter(job => {
+                const jid = String(job.job_id || '').toLowerCase();
+                const name = String(job.name || '').toLowerCase();
+                const user = String(job.user || '').toLowerCase();
+                const part = String(job.partition || '').toLowerCase();
+                const reason = String(job.reason || '').toLowerCase();
+                return jid.includes(searchLower) ||
+                       name.includes(searchLower) ||
+                       user.includes(searchLower) ||
+                       part.includes(searchLower) ||
+                       reason.includes(searchLower);
+            });
+        }
+
+        return filtered;
     }
 
     updateLastUpdateTime() {

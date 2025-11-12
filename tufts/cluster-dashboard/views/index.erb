@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cluster Monitor Dashboard</title>
-    <link rel="stylesheet" href="<%= request.script_name %>/styles.css">
+    <% begin; asset_v = File.mtime(File.expand_path('../public/script.js', __dir__)).to_i; css_v = File.mtime(File.expand_path('../public/styles.css', __dir__)).to_i; rescue; asset_v = css_v = Time.now.to_i; end %>
+    <link rel="stylesheet" href="<%= request.script_name %>/styles.css?v=<%= css_v %>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -140,6 +141,14 @@
         <!-- Job Queue Section -->
         <section class="section">
             <h2><i class="fas fa-clock"></i> Job Queue</h2>
+            <div class="table-controls">
+                <input type="text" id="job-search" class="search-input" placeholder="Search jobs...">
+                <select id="job-filter" class="filter-select">
+                    <option value="all">All Jobs</option>
+                    <option value="R">Running Only</option>
+                    <option value="PD">Pending Only</option>
+                </select>
+            </div>
             <div class="table-wrapper table-vertical-scroll">
                 <table class="jobs-table">
                     <thead>
@@ -163,7 +172,7 @@
         </section>
     </div>
 
-    <script src="<%= request.script_name %>/script.js"></script>
+    <script src="<%= request.script_name %>/script.js?v=<%= asset_v %>"></script>
 </body>
 </html>
 
