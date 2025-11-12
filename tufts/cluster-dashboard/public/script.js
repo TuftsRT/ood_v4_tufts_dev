@@ -233,9 +233,11 @@ class ClusterDashboard {
             // Search filter
             if (this.currentSearch) {
                 const searchLower = this.currentSearch.toLowerCase();
+                const partitionsStr = (node.partitions || []).join(',').toLowerCase();
                 if (!node.name.toLowerCase().includes(searchLower) &&
                     !node.status.toLowerCase().includes(searchLower) &&
-                    !(node.gpu_type && node.gpu_type.toLowerCase().includes(searchLower))) {
+                    !(node.gpu_type && node.gpu_type.toLowerCase().includes(searchLower)) &&
+                    !partitionsStr.includes(searchLower)) {
                     return false;
                 }
             }
