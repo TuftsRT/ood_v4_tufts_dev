@@ -1,0 +1,9 @@
+# Wait for the RClone Server to start
+echo "Waiting for RClone Server to open port ${port}..."
+if wait_until_port_used "${host}:${port}" 120; then
+  echo "Discovered RClone Server listening on port ${port}!"
+else
+  echo "Timed out waiting for RClone Server to open port ${port}!"
+  clean_up 1
+fi
+sleep 2

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+#
+# Start RClone Server
+#
+echo "password: ${RCLONE_PASSWORD}"
+echo "user: ${RCLONE_USERNAME}"
+echo "IP: ${host}:${port}"
+echo "RCLONE PATH: ${RCLONE_PATH}"
+
+${RCLONE_PATH}/rclone rcd --rc-web-gui  --rc-addr "${host}:${port}" --rc-user "${RCLONE_USERNAME}" --rc-pass "${RCLONE_PASSWORD}" --rc-serve --rc-allow-origin "*"

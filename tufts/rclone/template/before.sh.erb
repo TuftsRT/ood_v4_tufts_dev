@@ -1,0 +1,17 @@
+# Export the module function if it exists
+[[ $(type -t module) == "function" ]] && export -f module
+
+# Find available port to run server on
+port=$(find_port ${host})
+
+# Define username and password for RClone RC (remote control) authentication.
+# Use the job's cluster username and a random password so the "Connect" login matches.
+username="<%= ENV['USER'] || 'user' %>"
+echo "user: ${username}"
+export RCLONE_USERNAME="${username}"
+
+password=$(create_passwd 16)
+echo "password: ${password}"
+export RCLONE_PASSWORD="${password}"
+
+export RCLONE_PATH="<%= Dir.glob(BatchConnect::App.from_token(session.token).root.realpath.join("rclone-*-linux-amd64")).first.to_s %>"

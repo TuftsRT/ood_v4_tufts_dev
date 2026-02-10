@@ -1,0 +1,13 @@
+---
+cluster: "pax"
+
+attributes:
+  bc_account:
+    label: "Project"
+    help: "You can leave this blank if **not** in multiple projects."
+
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/all_partition.yml").indent(2) %>
+
+form:
+  - bc_account
+  - partition

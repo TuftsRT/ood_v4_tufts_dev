@@ -1,0 +1,7 @@
+---
+name: RClone Server
+category: Interactive Apps
+subcategory: Servers
+role: batch_connect
+description: |
+  This app will launch RClone on the Quick cluster
