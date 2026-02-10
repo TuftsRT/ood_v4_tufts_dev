@@ -5,12 +5,24 @@
 port=$(find_port ${host})
 
 # Define username and password for RClone RC (remote control) authentication.
-# Use the job's cluster username and a random password so the "Connect" login matches.
+# Use the job's cluster username and a per-user persistent password so new
+# sessions don't break existing browser logins.
 username="<%= ENV['USER'] || 'user' %>"
 echo "user: ${username}"
 export RCLONE_USERNAME="${username}"
 
-password=$(create_passwd 16)
+# Use a per-user password stored under the home directory so it stays stable
+# across RClone sessions. This avoids the "disconnected" state caused by the
+# browser reusing old credentials while the backend changes to a new password.
+passfile="${HOME}/.rclone_ood_password"
+if [[ -f "${passfile}" ]]; then
+  password="$(< "${passfile}")"
+else
+  password="$(create_passwd 16)"
+  echo "${password}" > "${passfile}"
+  chmod 600 "${passfile}"
+fi
+
 echo "password: ${password}"
 export RCLONE_PASSWORD="${password}"
 
