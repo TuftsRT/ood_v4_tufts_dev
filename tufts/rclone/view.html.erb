@@ -1,8 +1,8 @@
-<p class="text-muted mb-2">
-  When prompted, use your cluster username and the password shown in the session output log below (not your cluster password).
-</p>
-<form action="/rnode/<%= host %>/<%= port %>/#/dashboard" method="get" target="_blank">
+<form action="/rnode/<%= host %>/<%= port %>/#/dashboard" method="get" target="_blank" class="mb-3">
   <button class="btn btn-primary" type="submit">
     <i class="fa fa-registered"></i> Connect to RClone Server
   </button>
 </form>
+<p><strong>Username:</strong> <code><%= user %></code></p>
+<p><strong>Password:</strong> <code><%= password %></code></p>
+<p class="text-muted small mb-0">Use these credentials when prompted by the RClone web UI (not your cluster password).</p>
