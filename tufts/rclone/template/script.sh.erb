@@ -8,4 +8,5 @@ echo "user: ${RCLONE_USERNAME}"
 echo "IP: ${host}:${port}"
 echo "RCLONE PATH: ${RCLONE_PATH}"
 
-${RCLONE_PATH}/rclone rcd --rc-web-gui  --rc-addr "${host}:${port}" --rc-user "${RCLONE_USERNAME}" --rc-pass "${RCLONE_PASSWORD}" --rc-serve --rc-allow-origin "*"
+# Bind to 0.0.0.0 so the OnDemand proxy can reach the RC (avoids 503)
+${RCLONE_PATH}/rclone rcd --rc-web-gui --rc-addr "0.0.0.0:${port}" --rc-user "${RCLONE_USERNAME}" --rc-pass "${RCLONE_PASSWORD}" --rc-serve --rc-allow-origin "*"

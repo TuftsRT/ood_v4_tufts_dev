@@ -35,4 +35,8 @@ password: ${password}
 EOF
 fi
 
+# Use standard config location so remotes created via SSH/shell are visible in the web UI
+export RCLONE_CONFIG_DIR="${HOME}/.config/rclone"
+mkdir -p "${RCLONE_CONFIG_DIR}"
+
 export RCLONE_PATH="<%= Dir.glob(BatchConnect::App.from_token(session.token).root.realpath.join("rclone-*-linux-amd64")).first.to_s %>"
