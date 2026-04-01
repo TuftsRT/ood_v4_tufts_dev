@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         imgSrc = "https://user-images.githubusercontent.com/7244206/224844987-30e9b7c5-abb1-416d-9e3d-63dc8ce9d532.png";
         labelText = "Jupyter Lab";
       } else {
-        imgSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Jupyter_logo.svg/1767px-Jupyter_logo.svg.png";
+        imgSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Jupyter_logo.svg/1280px-Jupyter_logo.svg.png";
         labelText = "Jupyter Notebook";
       }
       
