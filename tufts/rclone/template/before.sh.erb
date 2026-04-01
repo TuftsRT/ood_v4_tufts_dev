@@ -39,4 +39,18 @@ fi
 export RCLONE_CONFIG_DIR="${HOME}/.config/rclone"
 mkdir -p "${RCLONE_CONFIG_DIR}"
 
+# Optional institutional OAuth: export RCLONE_CONFIG_<REMOTE>_CLIENT_ID / CLIENT_SECRET
+# (and related options) for a fixed remote name, e.g. RCLONE_CONFIG_GDRIVE_CLIENT_ID.
+# Site admins can set these in the batch environment, or users can source a local file.
+for _rclone_oauth_env in \
+  "${HOME}/.config/rclone/ood_oauth_env.sh" \
+  "/etc/ood/config/apps/rclone/ood_oauth_env.sh"; do
+  if [[ -f "${_rclone_oauth_env}" ]]; then
+    # shellcheck source=/dev/null
+    source "${_rclone_oauth_env}"
+    break
+  fi
+done
+unset _rclone_oauth_env
+
 export RCLONE_PATH="<%= Dir.glob(BatchConnect::App.from_token(session.token).root.realpath.join("rclone-*-linux-amd64")).first.to_s %>"
