@@ -10,6 +10,11 @@ rescue => _e
   ''
 end
 
+# Default partition filter; calling form.yml.erb can override before the include
+# by setting `@partition_filter = :cpu` (or :gpu). Used as the default for the
+# four generate_* helpers so app authors only set it in one place.
+@partition_filter ||= :all
+
 @nodes_out = capture_stdout('scontrol show node --oneliner')
 
 # Capture partition time limits
@@ -70,8 +75,19 @@ def node_is_available?(state_str)
   # Convert to uppercase for case-insensitive matching
   state = state_str.upcase
   
-  # States that make a node unavailable
-  unavailable_states = ['DOWN', 'DRAIN', 'DRAINING', 'DRAINED', 'FAIL', 'FAILING', 'MAINT', 'RESERVED', 'NOT_RESPONDING']
+  # States that make a node unavailable for scheduling (per SLURM scontrol/sinfo
+  # state docs). RESERVED/RESV are intentionally NOT here — reserved nodes are
+  # still schedulable for jobs in the reservation.
+  unavailable_states = [
+    'BLOCKED', 'CLOUD', 'COMP', 'COMPLETING',
+    'DOWN', 'DRAIN', 'DRAINED', 'DRAINING',
+    'FAIL', 'FAILING', 'FUTURE', 'FUTR',
+    'MAINT', 'NO_RESPOND', 'NOT_RESPONDING', 'NPC',
+    'PERFCTRS', 'PLANNED',
+    'POWER_DOWN', 'POWERING_DOWN', 'POWERED_DOWN', 'POWERING_UP',
+    'REBOOT_ISSUED', 'REBOOT_REQUESTED',
+    'UNK', 'UNKNOWN'
+  ]
   
   # Check if any unavailable state is present
   unavailable_states.any? { |s| state.include?(s) } ? false : true
@@ -209,14 +225,18 @@ end
     end
   end
   
-  # Track cores and memory by partition AND GPU type
-  parts.each do |p|
-    gpu_types_on_node.each do |gpu_type|
-      if cores > @max_cores_by_partition_and_gpu[p][gpu_type]
-        @max_cores_by_partition_and_gpu[p][gpu_type] = cores
-      end
-      if memory_mb > @max_memory_by_partition_and_gpu[p][gpu_type]
-        @max_memory_by_partition_and_gpu[p][gpu_type] = memory_mb
+  # Track cores and memory by partition AND GPU type. Skip nodes that are not
+  # currently schedulable so down/drained/maint nodes don't inflate the cap
+  # users see (e.g. batch's pax072/073 advertising 1008 GB while DOWN+DRAIN).
+  if is_available
+    parts.each do |p|
+      gpu_types_on_node.each do |gpu_type|
+        if cores > @max_cores_by_partition_and_gpu[p][gpu_type]
+          @max_cores_by_partition_and_gpu[p][gpu_type] = cores
+        end
+        if memory_mb > @max_memory_by_partition_and_gpu[p][gpu_type]
+          @max_memory_by_partition_and_gpu[p][gpu_type] = memory_mb
+        end
       end
     end
   end
@@ -441,10 +461,10 @@ def scope_partition_map(map, filter)
 end
 
 # Generate the complete num_cores field definition
-def generate_num_cores_field(filter: :all)
+def generate_num_cores_field(filter: @partition_filter)
   scoped_map = scope_partition_gpu_map(@max_cores_by_partition_and_gpu, filter)
   partition_max_values = scoped_map.reject { |k, _| k == 'all' }.values.flat_map(&:values)
-  scoped_max = partition_max_values.max || @global_max_cores
+  scoped_max = partition_max_values.reject(&:zero?).max || @global_max_cores
   scoped_map['all'] = { 'any' => scoped_max, 'none' => scoped_max }
   varies_by = filter == :cpu ? 'partition' : 'partition and GPU type'
 
@@ -467,10 +487,10 @@ def generate_num_cores_field(filter: :all)
 end
 
 # Generate the complete num_memory field definition
-def generate_num_memory_field(filter: :all)
+def generate_num_memory_field(filter: @partition_filter)
   scoped_map = scope_partition_gpu_map(@max_memory_by_partition_and_gpu, filter)
   partition_max_values = scoped_map.reject { |k, _| k == 'all' }.values.flat_map(&:values)
-  scoped_max_mb = partition_max_values.max || @global_max_memory
+  scoped_max_mb = partition_max_values.reject(&:zero?).max || @global_max_memory
   scoped_map['all'] = { 'any' => scoped_max_mb, 'none' => scoped_max_mb }
   max_memory_gb = (scoped_max_mb / 1024.0).round
   varies_by = filter == :cpu ? 'partition' : 'partition and GPU type'
@@ -494,10 +514,10 @@ def generate_num_memory_field(filter: :all)
 end
 
 # Generate the complete bc_num_hours field definition
-def generate_num_hours_field(filter: :all)
+def generate_num_hours_field(filter: @partition_filter)
   scoped_map = scope_partition_map(@max_hours_by_partition, filter)
   partition_max_values = scoped_map.reject { |k, _| k == 'all' }.values
-  scoped_max = partition_max_values.max || @global_max_hours
+  scoped_max = partition_max_values.reject(&:zero?).max || @global_max_hours
   scoped_map['all'] = scoped_max
 
   field_yaml = <<~YAML
@@ -517,7 +537,7 @@ end
 
 # Generate the partition field definition using user-accessible partitions
 # filter: :all (default), :gpu (GPU partitions only), :cpu (CPU-only partitions)
-def generate_partition_field(filter: :all)
+def generate_partition_field(filter: @partition_filter)
   filtered = @user_partitions.select do |p|
     has_gpu = !@detected_by_partition[p].empty?
     case filter

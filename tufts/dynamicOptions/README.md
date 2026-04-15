@@ -80,11 +80,12 @@ Remove any static includes for `partition`, `num_cores`, `num_memory`, `gpu_type
 <%= generate_num_hours_field.indent(2) %>
 ```
 - The `partition` field is now dynamically generated — it uses `sinfo` (without `--all`) which SLURM automatically filters to only partitions the current user can access. This replaces the old static `all_partition.yml` include.
-- `generate_partition_field` accepts an optional `filter:` keyword to restrict which partitions appear in the dropdown:
-  - `generate_partition_field` — shows all user-accessible partitions (default, equivalent to `filter: :all`)
-  - `generate_partition_field(filter: :gpu)` — shows only partitions that have GPU nodes (useful for GPU-only apps)
-  - `generate_partition_field(filter: :cpu)` — shows only CPU-only partitions
-- `generate_num_cores_field`, `generate_num_memory_field`, and `generate_num_hours_field` accept the same `filter:` keyword. Pass the same filter you used on `generate_partition_field` so that the input's `max`, help text, and per-partition data map are scoped to the visible partitions (e.g., with `filter: :cpu`, the help text drops the "and GPU type" wording and the maximums reflect only CPU partitions).
+- All four generators (`generate_partition_field`, `generate_num_cores_field`, `generate_num_memory_field`, `generate_num_hours_field`) honor a shared `@partition_filter` instance variable so you only declare scope once. Set it in the `<% %>` block that includes the partial, before calling any generator:
+  - `@partition_filter = :all` (default) — show every user-accessible partition
+  - `@partition_filter = :gpu` — only partitions that have GPU nodes (useful for GPU-only apps)
+  - `@partition_filter = :cpu` — only CPU-only partitions
+- The shared filter scopes the partition dropdown **and** the `max`, help text, and per-partition data maps for cores/memory/hours, so they all reflect only the visible partitions (e.g., with `:cpu`, the help text drops the "and GPU type" wording and the maximums reflect only CPU partitions).
+- For advanced cases you can still pass `filter:` to a single generator (e.g., `generate_num_cores_field(filter: :cpu)`); the explicit argument overrides `@partition_filter` for that call.
 - The generated `gpu_type` field references `javascript: "form.js"`, so make sure `form.js` is present at the app root.
 
 ### 5) Update the form order
@@ -185,6 +186,7 @@ Here’s a compact template for integrating into an existing app while keeping y
 # Include gpu_discovery FIRST, inside a code-only block.
 # IMPORTANT: cluster: must come AFTER this block (see note below).
 _partial_path = File.expand_path('partials/gpu_discovery.erb', __dir__)
+@partition_filter = :all   # or :cpu / :gpu — scopes all four generators below
 _gpu_result = ERB.new(File.read(_partial_path)).result(binding)
 %>
 
